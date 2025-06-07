@@ -10,45 +10,23 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  height: 100vh;
-  padding: 20px;
+  justify-content: flex-start;
+  min-height: 100vh;
+  padding-top: 140px; /* space from top */
+  gap: 20px; /* spacing between components */
 }
 
 .title-dark {
-  position: absolute;
-  top: 100px;
-  left: 530px;
   font-size: 32px;
-  margin-bottom: 30px;
   color: #ffffff;
+  text-align: center;
 }
 
-.input-dark
-{
-  position: absolute;
-  top: 200px;
-  left: 505px;
-  width: 80%;
-  max-width: 400px;
-  padding: 12px;
-  margin-bottom: 15px;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  background: #3f3f3f;
-  color: #fff;
-  outline: none;
-}
-
+.input-dark,
 .dropdown-dark {
-  position: absolute;
-  top: 280px;
-  left: 515px;
-  width: 80%;
+  width: 90%;
   max-width: 400px;
   padding: 12px;
-  margin-bottom: 15px;
   border: none;
   border-radius: 8px;
   font-size: 16px;
@@ -58,37 +36,92 @@ body {
 }
 
 .button-dark {
- padding-left: 33px;
- padding-right: 33px;
- padding-bottom: 16px;
- padding-top: 16px;
- border-radius: 9px;
- background-color: rgb(0, 0, 0);
- color: #ffffff;
- border: none;
- font-family: sans-serif;
- font-weight: bold;
- text-align: center;
- cursor: pointer;
- border: 2px solid;
- transition: 0.4s;
+  padding: 16px 33px;
+  border-radius: 9px;
+  background-color: rgb(0, 0, 0);
+  color: #ffffff;
+  border: 2px solid;
+  font-family: sans-serif;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.4s;
 }
 
 .button-dark:hover {
- background-color: rgb(255, 255, 255);
- color: #000000;
+  background-color: rgb(255, 255, 255);
+  color: #000000;
 }
 
-
-
 .result-dark {
-  margin-top: 30px;
   font-size: 24px;
   color: #ffffff;
 }
 
 .error-dark {
-  margin-top: 30px;
   font-size: 16px;
   color: #ff5e5e;
+}
+
+
+
+
+
+.card {
+  width: 300px;
+  height: 254px;
+  border-radius: 20px;
+  background: #1f1f1f;
+  position: relative;
+  padding: 1.8rem;
+  border: 2px solid #717172;
+  transition: 0.5s ease-out;
+  overflow: visible;
+  color: rgb(255, 255, 255);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.card-details {
+  text-align: center;
+}
+
+.card-button {
+  transform: translate(-50%, 125%);
+  width: 40%;
+  border-radius: 1rem;
+  border: none;
+  background: linear-gradient(144deg,#AF40FF, #5B42F3 50%,#00DDEB);
+  color: #fff;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  opacity: 0;
+  transition: 0.3s ease-out;
+  cursor: pointer;
+}
+
+.text-body {
+  color: rgb(134, 134, 134);
+}
+
+.text-title {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.card:hover {
+  border-color: #5b42f3;
+  background: #000000;
+  box-shadow: 0 4px 18px 0 rgba(0, 0, 0, 0.25);
+}
+
+.card:hover .card-button {
+  transform: translate(-50%, 50%);
+  opacity: 1;
 }

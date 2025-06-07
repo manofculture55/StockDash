@@ -2,18 +2,24 @@ import { useState } from "react";
 import "./App.css";
 
 function App() {
-  const [company, setCompany] = useState("Infosys");
+  const [company, setCompany] = useState("INFY");
   const [exchange, setExchange] = useState("NSE");
   const [price, setPrice] = useState("");
   const [error, setError] = useState("");
+  const [companyFullName, setCompanyFullName] = useState("");
+  
 
   const fetchPrice = () => {
     setPrice(""); setError("");
     fetch(`http://localhost:5000/api/stock-price?company=${company}&exchange=${exchange}`)
       .then(res => res.json())
       .then(data => {
-        if (data.price) setPrice(data.price);
-        else setError("Price not found");
+        if (data.price) {
+          setPrice(data.price);
+          setCompanyFullName(data.name || "");
+        } else {
+          setError("Price not found");
+        }
       })
       .catch(() => setError("Failed to fetch"));
   };
@@ -43,7 +49,16 @@ function App() {
         Get Stock Price
       </button>
 
-      {price && <h2 className="result-dark">{company} ({exchange}): {price}</h2>}
+      {price && (
+        <div className="card">
+          <div className="card-details">
+            <p className="text-title">{companyFullName || company}</p>
+            <p className="text-body">Price: {price}</p>
+          </div>
+          <button className="card-button">Buy Now</button>
+        </div>
+      )}
+
       {error && <p className="error-dark">{error}</p>}
     </div>
   );

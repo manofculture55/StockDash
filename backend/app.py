@@ -22,13 +22,18 @@ def get_stock_price():
         response = requests.get(url, headers=headers)
         soup = BeautifulSoup(response.text, "html.parser")
         price_element = soup.find("div", class_="YMlKec fxKbKc")
+        name_element = soup.find("div", class_="zzDege")
 
-        if price_element:
-            return jsonify({"price": price_element.text})
+
+        if price_element and name_element:
+            return jsonify({
+                "name": name_element.text,
+                "price": price_element.text
+            })
         else:
-            return jsonify({"error": "Price not found"}), 404
+            return jsonify({"error": "Price or name not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True)  
