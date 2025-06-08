@@ -15,7 +15,12 @@ def get_stock_price():
         return jsonify({"error": "Company name is required"}), 400
 
     symbol = company.upper().replace(" ", "")
-    url = f"https://www.google.com/finance/quote/{symbol}:{exchange.upper()}"
+
+    exchange_code = exchange.upper()
+    if exchange_code == "BSE":
+        exchange_code = "BOM"  # Use BOM for BSE on Google Finance
+
+    url = f"https://www.google.com/finance/quote/{symbol}:{exchange_code}"
     headers = {"User-Agent": "Mozilla/5.0"}
 
     try:
