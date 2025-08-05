@@ -10,14 +10,25 @@ function App() {
   const [error, setError] = useState("");
   const [companyFullName, setCompanyFullName] = useState("");
   const [showBuyModal, setShowBuyModal] = useState(false);
+  const [buyQuantity, setBuyQuantity] = useState(1);
+  const [buyPrice, setBuyPrice] = useState("");
 
-const openModal = () => setShowBuyModal(true);
-const closeModal = () => setShowBuyModal(false);
+  const openModal = () => {
+    console.log("Opening modal");
+    setShowBuyModal(true);
+    const cleanPrice = price.replace(/[^\d.-]/g, '');
+    setBuyPrice(cleanPrice);
+  };
 
-  
+  const closeModal = () => {
+    setShowBuyModal(false);
+    setBuyQuantity(1);
+    setBuyPrice(""); // Reset buy price
+  };
 
   const fetchPrice = () => {
-    setPrice(""); setError("");
+    setPrice("");
+    setError("");
     fetch(`http://localhost:5000/api/stock-price?company=${company}&exchange=${exchange}`)
       .then(res => res.json())
       .then(data => {
@@ -31,10 +42,50 @@ const closeModal = () => setShowBuyModal(false);
       .catch(() => setError("Failed to fetch"));
   };
 
+  // Handle buying stock
+  const handleBuyStock = () => {
+    if (!buyPrice || buyPrice <= 0) {
+      alert('Please enter a valid buying price');
+      return;
+    }
+
+    const holdingData = {
+      name: companyFullName || company,
+      symbol: company,
+      price: `₹${parseFloat(buyPrice).toFixed(2)}`, // Format as currency
+      marketPrice: price, // Keep original fetched price for reference
+      quantity: buyQuantity,
+      exchange: exchange
+    };
+
+    fetch('http://localhost:5000/api/holdings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(holdingData)
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.message) {
+          alert('Stock added to holdings successfully!');
+          closeModal();
+        } else {
+          alert('Error adding stock to holdings');
+        }
+      })
+      .catch(err => {
+        console.error('Error:', err);
+        alert('Failed to add stock to holdings');
+      });
+  };
+
+  // Calculate total cost (optional usage; remove if unused)
+  const totalCost = (parseFloat(buyPrice) || 0) * buyQuantity;
+
   return (
     <Router>
       <div className="app-dark">
-
         <div className="title-container">
           <h1 className="title-dark">Stock Market Dashboard</h1>
         </div>
@@ -48,7 +99,6 @@ const closeModal = () => setShowBuyModal(false);
           </Link>
         </nav>
 
-
         <Routes>
           <Route path="/" element={
             <div>
@@ -57,10 +107,10 @@ const closeModal = () => setShowBuyModal(false);
                   <svg className="search-icon" aria-hidden="true" viewBox="0 0 24 24">
                     <g>
                       <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 
-                            4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 
-                            3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 
-                            11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 
-                            7.5-7.5-3.365-7.5-7.5z" />
+                              4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 
+                              3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 
+                              11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 
+                              7.5-7.5-3.365-7.5-7.5z" />
                     </g>
                   </svg>
                   <input
@@ -70,9 +120,7 @@ const closeModal = () => setShowBuyModal(false);
                     value={company}
                     onChange={(e) => setCompany(e.target.value)}
                   />
-
                 </div>
-
 
                 <select
                   className="dropdown-dark"
@@ -105,21 +153,84 @@ const closeModal = () => setShowBuyModal(false);
           } />
 
           <Route path="/Holdings" element={<Holdings />} />
-          {/* other routes */}
         </Routes>
       </div>
+
       {showBuyModal && (
         <div className="modal-overlay">
           <div className="modal-card">
-            <h2>Purchase Successful</h2>
-            <button onClick={closeModal}>Close</button>
+            <h2>Buy {companyFullName || company}</h2>
+            <p>Price: {price}</p>
+
+            <div style={{ margin: '20px 0' }}>
+              <label style={{ display: 'block', marginBottom: '10px', color: 'white' }}>
+                Quantity:
+                <input
+                  type="number"
+                  min="1"
+                  value={buyQuantity}
+                  onChange={(e) => setBuyQuantity(parseInt(e.target.value) || 1)}
+                  style={{
+                    marginLeft: '10px',
+                    padding: '5px',
+                    width: '80px',
+                    background: '#333',
+                    color: 'white',
+                    border: '1px solid #555',
+                    borderRadius: '4px'
+                  }}
+                />
+              </label>
+
+              <label style={{ display: 'block', marginBottom: '10px', color: 'white' }}>
+                Buy Price (₹):
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  value={buyPrice}
+                  onChange={(e) => setBuyPrice(e.target.value)}
+                  placeholder="Enter buy price"
+                  style={{
+                    marginLeft: '10px',
+                    padding: '5px',
+                    width: '120px',
+                    background: '#333',
+                    color: 'white',
+                    border: '1px solid #555',
+                    borderRadius: '4px'
+                  }}
+                />
+              </label>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '20px' }}>
+              <button onClick={handleBuyStock} style={{
+                padding: '10px 20px',
+                background: '#5B42F3',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer'
+              }}>
+                Confirm Buy
+              </button>
+              <button onClick={closeModal} style={{
+                padding: '10px 20px',
+                background: '#666',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer'
+              }}>
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
-
     </Router>
   );
 }
-
 
 export default App;
