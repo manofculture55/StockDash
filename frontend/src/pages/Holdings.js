@@ -5,10 +5,9 @@ function Holdings() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-    // New state for Sell modal
   const [showSellModal, setShowSellModal] = useState(false);
   const [selectedHolding, setSelectedHolding] = useState(null);
-  const [sellQuantity, setSellQuantity] = useState(1);
+  const [sellQuantity, setSellQuantity] = useState("");
 
   useEffect(() => {
     fetchHoldings();
@@ -20,9 +19,10 @@ function Holdings() {
       .then(res => res.json())
       .then(data => {
         setHoldings(data.holdings || []);
+        setError(""); // Clear error on success
         setLoading(false);
       })
-      .catch(err => {
+      .catch(() => {
         setError("Failed to fetch holdings");
         setLoading(false);
       });
@@ -30,14 +30,14 @@ function Holdings() {
 
   const openSellModal = (holding) => {
     setSelectedHolding(holding);
-    setSellQuantity(1);
+    setSellQuantity("");
     setShowSellModal(true);
   };
 
   const closeSellModal = () => {
     setShowSellModal(false);
     setSelectedHolding(null);
-    setSellQuantity(1);
+    setSellQuantity("");
   };
 
   const confirmSell = () => {
@@ -55,7 +55,7 @@ function Holdings() {
       .then(data => {
         if (data.message) {
           alert(data.message);
-          fetchHoldings();  // Refresh holdings list
+          fetchHoldings();
           closeSellModal();
         } else if (data.error) {
           alert(`Error: ${data.error}`);
@@ -66,7 +66,6 @@ function Holdings() {
       });
   };
 
-
   const calculateTotal = () => {
     return holdings.reduce((total, holding) => {
       const price = parseFloat(holding.price.replace(/[^\d.-]/g, '')) || 0;
@@ -74,12 +73,14 @@ function Holdings() {
     }, 0);
   };
 
-  if (loading) return <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Loading holdings...</div>;
+  if (loading) {
+    return <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Loading holdings...</div>;
+  }
 
   return (
     <div style={{ padding: '20px', minHeight: '100vh' }}>
       <h2 style={{ color: 'white', textAlign: 'center', marginBottom: '30px' }}>My Holdings</h2>
-      
+
       {holdings.length === 0 ? (
         <div style={{ textAlign: 'center', color: '#999', marginTop: '50px' }}>
           <p>No holdings yet.</p>
@@ -87,11 +88,11 @@ function Holdings() {
         </div>
       ) : (
         <>
-          <div style={{ 
-            textAlign: 'center', 
-            marginBottom: '30px', 
-            padding: '20px', 
-            background: '#1f1f1f', 
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '30px',
+            padding: '20px',
+            background: '#1f1f1f',
             borderRadius: '10px',
             border: '2px solid #717172'
           }}>
@@ -100,23 +101,28 @@ function Holdings() {
             </h3>
           </div>
 
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
-            gap: '20px' 
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '20px',
+            justifyContent: 'center'
           }}>
+
             {holdings.map((holding, index) => (
-              <div key={index} className="card" style={{ marginBottom: '0' }}>
+              <div 
+                key={index} 
+                className="card" 
+                style={{ 
+                  flex: '1 1 300px',   // Flexible min width
+                  maxWidth: '350px',   // Optional: prevents too-wide cards
+                  marginBottom: '20px' 
+                }}
+              >
                 <div className="card-details">
                   <p className="text-title">{holding.name}</p>
                   <p style={{ color: '#999', margin: '5px 0' }}>Symbol: {holding.symbol}</p>
                   <p style={{ color: '#999', margin: '5px 0' }}>Exchange: {holding.exchange}</p>
                   <p className="text-body">Buy Price: {holding.price}</p>
-                  {holding.marketPrice && (
-                    <p style={{ color: '#666', margin: '5px 0', fontSize: '14px' }}>
-                      Market Price at Purchase: {holding.marketPrice}
-                    </p>
-                  )}
                   <p style={{ color: '#999', margin: '5px 0' }}>Quantity: {holding.quantity}</p>
                   <p style={{ color: '#5B42F3', fontWeight: 'bold' }}>
                     Total Investment: ₹{(parseFloat(holding.price.replace(/[^\d.-]/g, '')) * holding.quantity).toFixed(2)}
@@ -125,26 +131,26 @@ function Holdings() {
                     Purchased: {new Date(holding.purchaseDate).toLocaleDateString()}
                   </p>
                   <button
-                  onClick={() => openSellModal(holding)}
-                  style={{
-                    marginTop: '10px',
-                    backgroundColor: '#ffaa00',
-                    color: 'black',
-                    border: 'none',
-                    padding: '8px 15px',
-                    borderRadius: '5px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Sell
-                </button>
+                    onClick={() => openSellModal(holding)}
+                    style={{
+                      marginTop: '10px',
+                      backgroundColor: '#ffaa00',
+                      color: 'black',
+                      border: 'none',
+                      padding: '8px 15px',
+                      borderRadius: '5px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Sell
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         </>
       )}
-      
+
       {error && <p style={{ color: '#ff5e5e', textAlign: 'center' }}>{error}</p>}
 
       {/* Sell Modal */}
@@ -160,7 +166,18 @@ function Holdings() {
                 min="1"
                 max={selectedHolding.quantity}
                 value={sellQuantity}
-                onChange={(e) => setSellQuantity(parseInt(e.target.value) || 1)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "") {
+                    setSellQuantity("");
+                  } else {
+                    const num = Number(value);
+                    if (num > 0) {
+                      setSellQuantity(num);
+                    }
+                  }
+                }}
+
                 style={{
                   marginLeft: '10px',
                   padding: '5px',
@@ -202,7 +219,6 @@ function Holdings() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

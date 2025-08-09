@@ -3,9 +3,9 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #000000;
+  background-color: #000;
   font-family: 'Roboto', sans-serif;
-  color: rgb(255, 255, 255);
+  color: #fff;
 }
 
 /* App Container */
@@ -16,40 +16,35 @@ body {
 
 /* Title Styling */
 .title-container {
-  margin-top: 25px;
-  margin-left: 25px;
-  margin-bottom: 40px;
+  margin: 25px 0 40px 25px;
 }
 
 .title-dark {
   font-size: 32px;
-  color: #ffffff;
 }
 
 /* Navigation Buttons */
 .Nav-Bar {
   display: flex;
-  justify-content: flex-end;  /* Push buttons to the right */
-  gap: 100px;                  /* Spacing between buttons */
-  margin: -65px 95px 40px 25px; /* Top, Right, Bottom, Left */
+  justify-content: flex-end;
+  gap: 100px;
+  margin: -65px 95px 40px 25px;
 }
 
 .Nav-Bar button {
   font-size: 18px;
   color: #e1e1e1;
   font-weight: 800;
-  font-family: inherit;
   background: none;
   border: none;
   cursor: pointer;
   position: relative;
   text-transform: uppercase;
-  transition: color 400ms cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.Nav-Bar button:hover,
-.Nav-Bar button:focus {
-  color: #ffffff;
+.Nav-Bar button:hover {
+  color: #fff;
 }
 
 .Nav-Bar button::after {
@@ -60,49 +55,44 @@ body {
   width: 0%;
   height: 2px;
   background: linear-gradient(144deg, #AF40FF, #5B42F3 50%, #00DDEB);
-  transition: width 400ms, left 400ms;
+  transition: width 0.4s, left 0.4s;
   transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.Nav-Bar button:hover::after,
-.Nav-Bar button:focus::after {
+.Nav-Bar button:hover::after {
   width: 100%;
   left: 0;
 }
 
+/* Search Bar */
 .search-group {
   display: flex;
-  line-height: 28px;
   align-items: center;
   padding-top: 100px;
   position: relative;
   width: 400px;
-  margin: 0 auto; /* center horizontally */
+  margin: 0 auto;
 }
 
 .search-input {
   width: 100%;
   height: 40px;
-  line-height: 28px;
-  padding: 0 1rem;
-  padding-left: 2.5rem;
+  padding: 0 1rem 0 2.5rem;
   border: 2px solid transparent;
   border-radius: 8px;
-  outline: none;
   background-color: #252525;
-  color: #ffffff;
+  color: #fff;
   font-size: 16px;
-  transition: 0.3s ease;
+  transition: 0.3s;
 }
 
 .search-input::placeholder {
   color: #9e9ea7;
 }
 
-.search-input:focus,
-.search-input:hover {
-  outline: none;
-  background-color: #000000;
+.search-input:hover,
+.search-input:focus {
+  background-color: #000;
   box-shadow: 0 0 0 4px rgba(102, 102, 102, 0.1);
 }
 
@@ -114,10 +104,8 @@ body {
   height: 1rem;
 }
 
-
-/* Form Inputs and Dropdowns */
+/* Form Inputs */
 .inputs-container {
-  width: 100%;
   max-width: 400px;
   margin: 0 auto 40px;
   display: flex;
@@ -133,7 +121,7 @@ body {
   border-radius: 8px;
   font-size: 16px;
   background: #3f3f3f;
-  color: #ffffff;
+  color: #fff;
   outline: none;
 }
 
@@ -141,18 +129,15 @@ body {
   width: 40%;
   padding: 10px;
   border: none;
-  margin-top: 10px;
   border-radius: 8px;
   font-size: 13px;
-  background: #222222;
-  color: #ffffff;
-  outline: none;
+  background: #222;
+  color: #fff;
 }
 
 .dropdown-dark:hover {
-  background: #000000;
+  background: #000;
 }
-
 
 /* Submit Button */
 .button-dark {
@@ -160,16 +145,15 @@ body {
   margin-top: 50px;
   width: 200px;
   border-radius: 30px;
-  background-color: black;
+  background: black;
   color: white;
   border: 2px solid;
-  font-family: inherit;
   cursor: pointer;
   transition: 0.4s;
 }
 
 .button-dark:hover {
-  background-color: white;
+  background: white;
   width: 250px;
   border-radius: 12px;
   color: black;
@@ -177,7 +161,6 @@ body {
 
 /* Card Container */
 .card-container {
-  width: 100%;
   max-width: 320px;
   margin: 40px auto;
   display: flex;
@@ -191,14 +174,13 @@ body {
   border-radius: 20px;
   background: #1f1f1f;
   border: 2px solid #717172;
-  transition: 0.5s ease-out;
+  transition: 0.5s;
   color: white;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5em;
   position: relative;
-  overflow: visible;
 }
 
 .card:hover {
@@ -220,11 +202,11 @@ body {
   width: 40%;
   border-radius: 1rem;
   border: none;
-  background: #ffffff;
-  color: rgb(0, 0, 0);
+  background: #fff;
+  color: #000;
   font-size: 1rem;
   padding: 0.5rem 1rem;
-  transition: 0.3s ease-out;
+  transition: 0.3s;
   cursor: pointer;
 }
 
@@ -233,15 +215,13 @@ body {
   opacity: 1;
 }
 
-/* Text inside card */
 .text-title {
   font-size: 1.5em;
   color: #5b42f3;
 }
 
-
 .text-body {
-  color: rgb(134, 134, 134);
+  color: #868686;
 }
 
 /* Error Message */
@@ -252,7 +232,7 @@ body {
   margin-top: 20px;
 }
 
-
+/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -266,15 +246,14 @@ body {
 }
 
 .modal-card {
-  background-color: #000000;
-  border: 4px solid #333333;
+  background: #000;
+  border: 4px solid #333;
   border-radius: 30px;
   width: 500px;
   height: 500px;
   text-align: center;
   color: white;
 }
-
 
 .modal-card button {
   margin-top: 350px;
@@ -289,8 +268,7 @@ body {
   transition: 0.3s;
 }
 
-.modal-card button:hover{
+.modal-card button:hover {
   background: rgb(17, 167, 30);
   box-shadow: 0 0 0 3px rgba(47, 255, 116, 0.384);
-  color: #fff;
 }

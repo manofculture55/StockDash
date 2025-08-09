@@ -2,13 +2,15 @@
   "holdings": [
     {
       "name": "State Bank of India",
-      "symbol": "SBIn",
-      "price": "\u20b9800.00",
-      "marketPrice": "\u20b9800.50",
-      "quantity": 5,
+      "symbol": "SBIN",
+      "price": "\u20b91000.00",
+      "marketPrice": "\u20b9802.50",
+      "quantity": 20,
       "exchange": "NSE",
-      "purchaseDate": "2025-08-05T10:31:50.606841",
-      "id": 1754415110.606853
+      "purchaseDate": "2025-08-09T10:34:29.284052",
+      "id": 1754760869.284062,
+      "ticker": "sbin",
+      "avgPrice": 1000.0
     }
   ]
 }
