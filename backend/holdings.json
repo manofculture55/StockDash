@@ -1,16 +1,28 @@
 {
   "holdings": [
     {
+      "name": "REC Limited",
+      "symbol": "RECLTD",
+      "price": "\u20b9472.73",
+      "marketPrice": "\u20b9381.40",
+      "quantity": 6,
+      "exchange": "NSE",
+      "purchaseDate": "2025-08-10T03:55:17.410741",
+      "id": 1754823317.410751,
+      "ticker": "recltd",
+      "avgPrice": 472.73
+    },
+    {
       "name": "State Bank of India",
       "symbol": "SBIN",
-      "price": "\u20b91000.00",
+      "price": "\u20b9750.00",
       "marketPrice": "\u20b9802.50",
-      "quantity": 20,
+      "quantity": 10,
       "exchange": "NSE",
-      "purchaseDate": "2025-08-09T10:34:29.284052",
-      "id": 1754760869.284062,
+      "purchaseDate": "2025-08-10T06:42:11.838339",
+      "id": 1754833331.838352,
       "ticker": "sbin",
-      "avgPrice": 1000.0
+      "avgPrice": 750.0
     }
   ]
 }

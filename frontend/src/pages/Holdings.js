@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Holdings() {
   const [holdings, setHoldings] = useState([]);
@@ -8,6 +9,9 @@ function Holdings() {
   const [showSellModal, setShowSellModal] = useState(false);
   const [selectedHolding, setSelectedHolding] = useState(null);
   const [sellQuantity, setSellQuantity] = useState("");
+
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     fetchHoldings();
@@ -88,66 +92,78 @@ function Holdings() {
         </div>
       ) : (
         <>
-          <div style={{
-            textAlign: 'center',
-            marginBottom: '30px',
-            padding: '20px',
-            background: '#1f1f1f',
-            borderRadius: '10px',
-            border: '2px solid #717172'
+          <table style={{ 
+            width: '80%', 
+            color: 'white', 
+            borderCollapse: 'collapse', 
+            border: '2px solid #444', 
+            margin: '0 auto' 
           }}>
-            <h3 style={{ color: '#5B42F3', margin: '0' }}>
-              Total Portfolio Value: ₹{calculateTotal().toFixed(2)}
-            </h3>
-          </div>
+            <thead>
+              <tr style={{ borderBottom: '1px solid #444' }}>
+                <th style={{ textAlign: 'left', padding: '10px' }}>Company</th>
+                <th style={{ textAlign: 'right', padding: '10px' }}>Market Price</th>
+                <th style={{ textAlign: 'right', padding: '10px' }}>Returns (₹ / %)</th>
+                <th style={{ textAlign: 'right', padding: '10px' }}>Current Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {holdings.map((holding, index) => {
+                const avgPrice = parseFloat(holding.avgPrice);
+                const marketPrice = parseFloat(holding.marketPrice.replace(/[^\d.-]/g, '')) || 0;
+                const quantity = holding.quantity;
+                const totalInvestment = avgPrice * quantity;
+                const currentValue = marketPrice * quantity;
+                const returnsValue = currentValue - totalInvestment;
+                const returnsPercent = (returnsValue / totalInvestment) * 100;
 
-          <div style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '20px',
-            justifyContent: 'center'
-          }}>
-
-            {holdings.map((holding, index) => (
-              <div 
-                key={index} 
-                className="card" 
-                style={{ 
-                  flex: '1 1 300px',   // Flexible min width
-                  maxWidth: '350px',   // Optional: prevents too-wide cards
-                  marginBottom: '20px' 
-                }}
-              >
-                <div className="card-details">
-                  <p className="text-title">{holding.name}</p>
-                  <p style={{ color: '#999', margin: '5px 0' }}>Symbol: {holding.symbol}</p>
-                  <p style={{ color: '#999', margin: '5px 0' }}>Exchange: {holding.exchange}</p>
-                  <p className="text-body">Buy Price: {holding.price}</p>
-                  <p style={{ color: '#999', margin: '5px 0' }}>Quantity: {holding.quantity}</p>
-                  <p style={{ color: '#5B42F3', fontWeight: 'bold' }}>
-                    Total Investment: ₹{(parseFloat(holding.price.replace(/[^\d.-]/g, '')) * holding.quantity).toFixed(2)}
-                  </p>
-                  <p style={{ color: '#666', fontSize: '12px', marginTop: '10px' }}>
-                    Purchased: {new Date(holding.purchaseDate).toLocaleDateString()}
-                  </p>
-                  <button
-                    onClick={() => openSellModal(holding)}
-                    style={{
-                      marginTop: '10px',
-                      backgroundColor: '#ffaa00',
-                      color: 'black',
-                      border: 'none',
-                      padding: '8px 15px',
-                      borderRadius: '5px',
-                      cursor: 'pointer'
-                    }}
+                return (
+                  <tr   
+                    key={index}
+                    className="clickable-row"
+                    style={{ borderBottom: '1px solid #444' }}
+                    onClick={() => navigate(`/holding-details/${holding.id}`)}
                   >
-                    Sell
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+                    <td style={{ padding: '15px' }}>
+                      <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>{holding.name}</div>
+                      <div style={{ fontSize: '12px', color: '#999' }}>
+                        {quantity} shares • Avg. ₹{avgPrice.toFixed(2)}
+                      </div>
+                    </td>
+                    <td style={{ padding: '10px', textAlign: 'right' }}>
+                      ₹{marketPrice.toFixed(2)}
+                    </td>
+
+                    <td style={{ padding: '10px', textAlign: 'right', fontWeight: 'bold', whiteSpace: 'normal', lineHeight: '1.3' }}>
+                      {returnsValue >= 0 ? '+' : '-'}₹{Math.abs(returnsValue).toFixed(2)}
+                      <br />
+                      <span style={{ color: returnsValue >= 0 ? '#00FF00' : '#FF4C4C', fontSize: '0.8rem' }}>
+                        ({returnsPercent.toFixed(2)}%)
+                      </span>
+                    </td>
+
+
+                    <td style={{ padding: '10px', textAlign: 'right', whiteSpace: 'normal', lineHeight: '1.3' }}>
+                      <span style={{ 
+                        fontWeight: 'bold', 
+                        color: currentValue >= totalInvestment ? '#00FF00' : '#FF4C4C', 
+                        fontSize: '1rem' 
+                      }}>
+                        ₹{currentValue.toFixed(2)}
+                      </span>
+                      <br />
+                      <span style={{ fontSize: '0.9rem', color: '#fff' }}>
+                        Invested: ₹{totalInvestment.toFixed(2)}
+                      </span>
+                    </td>
+
+
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+
         </>
       )}
 

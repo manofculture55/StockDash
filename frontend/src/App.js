@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Holdings from "./pages/Holdings";
+import HoldingDetails from './pages/HoldingDetails'; // import the new component
 
 function App() {
   const [company, setCompany] = useState("SBIN");
@@ -12,6 +13,8 @@ function App() {
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [buyQuantity, setBuyQuantity] = useState("");
   const [buyPrice, setBuyPrice] = useState("");
+  const [purchaseDate, setPurchaseDate] = useState('');
+
 
   const openModal = () => {
     setShowBuyModal(true);
@@ -61,7 +64,9 @@ function App() {
       marketPrice: price,
       quantity: buyQuantity,
       exchange: exchange,
+      purchaseDate: purchaseDate || new Date().toISOString().split('T')[0], // Save manual or today's date
     };
+
 
     fetch("http://localhost:5000/api/holdings", {
       method: "POST",
@@ -154,7 +159,10 @@ function App() {
             }
           />
           <Route path="/Holdings" element={<Holdings />} />
+          <Route path="/holding-details/:id" element={<HoldingDetails />} />
         </Routes>
+
+        
       </div>
 
       {showBuyModal && (
@@ -181,8 +189,6 @@ function App() {
                     borderRadius: "4px",
                   }}
                 />
-
-                
               </label>
 
               <label style={{ display: "block", marginBottom: "10px", color: "white" }}>
@@ -205,6 +211,26 @@ function App() {
                   }}
                 />
               </label>
+
+              <label style={{ display: "block", marginBottom: "10px", color: "white" }}>
+                Purchase Date:
+                <input
+                  type="date"
+                  value={purchaseDate}
+                  onChange={(e) => setPurchaseDate(e.target.value)}
+                  style={{
+                    marginLeft: "10px",
+                    padding: "5px",
+                    width: "150px",
+                    background: "#333",
+                    color: "white",
+                    border: "1px solid #555",
+                    borderRadius: "4px",
+                  }}
+                  required
+                />
+              </label>
+
             </div>
 
             <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "20px" }}>

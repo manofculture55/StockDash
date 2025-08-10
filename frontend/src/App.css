@@ -170,7 +170,7 @@ body {
 .card {
   width: 300px;
   min-height: 254px;
-  padding: 1.8rem;
+  padding: 1.5rem;
   border-radius: 20px;
   background: #1f1f1f;
   border: 2px solid #717172;
@@ -216,8 +216,7 @@ body {
 }
 
 .text-title {
-  font-size: 1.5em;
-  color: #5b42f3;
+  font-size: 25px;
 }
 
 .text-body {
@@ -271,4 +270,14 @@ body {
 .modal-card button:hover {
   background: rgb(17, 167, 30);
   box-shadow: 0 0 0 3px rgba(47, 255, 116, 0.384);
+}
+
+
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clickable-row:hover {
+  background-color: #333;
 }
