@@ -1,28 +1,116 @@
 {
   "holdings": [
     {
-      "name": "REC Limited",
-      "symbol": "RECLTD",
-      "price": "\u20b9472.73",
-      "marketPrice": "\u20b9381.40",
-      "quantity": 6,
-      "exchange": "NSE",
-      "purchaseDate": "2025-08-10T03:55:17.410741",
-      "id": 1754823317.410751,
-      "ticker": "recltd",
-      "avgPrice": 472.73
-    },
-    {
       "name": "State Bank of India",
       "symbol": "SBIN",
-      "price": "\u20b9750.00",
-      "marketPrice": "\u20b9802.50",
+      "price": "\u00e2\u201a\u00b9750.00",
+      "marketPrice": "\u00e2\u201a\u00b9802.50",
       "quantity": 10,
       "exchange": "NSE",
-      "purchaseDate": "2025-08-10T06:42:11.838339",
-      "id": 1754833331.838352,
+      "id": 1754850558.126482,
       "ticker": "sbin",
       "avgPrice": 750.0
+    },
+    {
+      "name": "Wipro Ltd",
+      "symbol": "WIPRo",
+      "price": "\u20b9238.20",
+      "marketPrice": "\u00e2\u201a\u00b9239.33",
+      "quantity": 23,
+      "exchange": "NSE",
+      "id": 1754851579.932364,
+      "ticker": "wipro",
+      "avgPrice": 238.2
+    },
+    {
+      "name": "Infosys Ltd",
+      "symbol": "INFY",
+      "price": "\u00e2\u201a\u00b91424.00",
+      "marketPrice": "\u00e2\u201a\u00b91,424.00",
+      "quantity": 1,
+      "exchange": "NSE",
+      "id": 1754852852.667165,
+      "ticker": "infy",
+      "avgPrice": 1424.0
+    },
+    {
+      "name": "Axis Bank Ltd",
+      "symbol": "AXISBANK",
+      "price": "\u20b91068.00",
+      "marketPrice": "\u20b91,068.00",
+      "quantity": 8,
+      "exchange": "NSE",
+      "date": "gfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfd",
+      "id": "0b044c5ffe9ac4c3",
+      "ticker": "axisbank",
+      "avgPrice": 1068.0
+    },
+    {
+      "name": "ITC Ltd",
+      "symbol": "ITC",
+      "price": "\u20b9400.00",
+      "marketPrice": "\u20b9411.45",
+      "quantity": 10,
+      "exchange": "NSE",
+      "date": "gfghefrhgf",
+      "id": "24b7d4bbb70bb908",
+      "ticker": "itc",
+      "avgPrice": 400.0
+    },
+    {
+      "name": "REC Limited",
+      "symbol": "RECLTD",
+      "price": "\u20b9381.50",
+      "marketPrice": "\u20b9381.50",
+      "quantity": 6,
+      "exchange": "NSE",
+      "date": "hfghfg",
+      "id": "bff43840f38531c4",
+      "ticker": "recltd",
+      "avgPrice": 381.5
+    },
+    {
+      "name": "Tata Consultancy Services Ltd",
+      "symbol": "tcs",
+      "price": "\u20b92111.25",
+      "marketPrice": "\u20b93,022.50",
+      "quantity": 2,
+      "exchange": "NSE",
+      "date": "22-04-2005",
+      "id": "f1b806f24fd98c03",
+      "ticker": "tcs",
+      "avgPrice": 2111.25
+    },
+    {
+      "name": "Eternal Ltd",
+      "symbol": "eternal",
+      "price": "\u20b9317.70",
+      "marketPrice": "\u20b9317.70",
+      "quantity": 1,
+      "exchange": "NSE",
+      "date": "55-55-4835",
+      "id": "84d89eefa80328ac",
+      "ticker": "eternal",
+      "avgPrice": 317.7
+    },
+    {
+      "name": "Central Depository Services (India) Ltd",
+      "symbol": "cdsl",
+      "price": "\u20b91561.00",
+      "marketPrice": "\u20b91,561.00",
+      "quantity": 4,
+      "exchange": "NSE",
+      "date": "12-12-2005",
+      "id": "864e41883e4bafba",
+      "ticker": "cdsl",
+      "avgPrice": 1561.0,
+      "purchases": [
+        {
+          "date": "12-12-2005",
+          "quantity": 4,
+          "price": 1561.0
+        }
+      ]
     }
   ]
 }

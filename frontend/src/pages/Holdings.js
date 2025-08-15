@@ -12,7 +12,6 @@ function Holdings() {
 
   const navigate = useNavigate();
 
-
   useEffect(() => {
     fetchHoldings();
   }, []);
@@ -23,7 +22,7 @@ function Holdings() {
       .then(res => res.json())
       .then(data => {
         setHoldings(data.holdings || []);
-        setError(""); // Clear error on success
+        setError("");
         setLoading(false);
       })
       .catch(() => {
@@ -68,13 +67,6 @@ function Holdings() {
       .catch(() => {
         alert('Failed to process sell request');
       });
-  };
-
-  const calculateTotal = () => {
-    return holdings.reduce((total, holding) => {
-      const price = parseFloat(holding.price.replace(/[^\d.-]/g, '')) || 0;
-      return total + (price * holding.quantity);
-    }, 0);
   };
 
   if (loading) {
@@ -142,7 +134,6 @@ function Holdings() {
                       </span>
                     </td>
 
-
                     <td style={{ padding: '10px', textAlign: 'right', whiteSpace: 'normal', lineHeight: '1.3' }}>
                       <span style={{ 
                         fontWeight: 'bold', 
@@ -156,20 +147,16 @@ function Holdings() {
                         Invested: ₹{totalInvestment.toFixed(2)}
                       </span>
                     </td>
-
-
                   </tr>
                 );
               })}
             </tbody>
           </table>
-
         </>
       )}
 
       {error && <p style={{ color: '#ff5e5e', textAlign: 'center' }}>{error}</p>}
 
-      {/* Sell Modal */}
       {showSellModal && selectedHolding && (
         <div className="modal-overlay">
           <div className="modal-card" style={{ textAlign: 'center', padding: '30px' }}>
@@ -193,7 +180,6 @@ function Holdings() {
                     }
                   }
                 }}
-
                 style={{
                   marginLeft: '10px',
                   padding: '5px',

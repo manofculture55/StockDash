@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Holdings from "./pages/Holdings";
-import HoldingDetails from './pages/HoldingDetails'; // import the new component
+import HoldingDetails from './pages/HoldingDetails';
 
 function App() {
   const [company, setCompany] = useState("SBIN");
@@ -13,7 +13,7 @@ function App() {
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [buyQuantity, setBuyQuantity] = useState("");
   const [buyPrice, setBuyPrice] = useState("");
-  const [purchaseDate, setPurchaseDate] = useState('');
+  const [date, setdate] = useState("");
 
 
   const openModal = () => {
@@ -26,6 +26,7 @@ function App() {
     setShowBuyModal(false);
     setBuyQuantity("");
     setBuyPrice("");
+    setdate("");
   };
 
   const fetchPrice = () => {
@@ -64,9 +65,8 @@ function App() {
       marketPrice: price,
       quantity: buyQuantity,
       exchange: exchange,
-      purchaseDate: purchaseDate || new Date().toISOString().split('T')[0], // Save manual or today's date
+      date: date
     };
-
 
     fetch("http://localhost:5000/api/holdings", {
       method: "POST",
@@ -95,12 +95,8 @@ function App() {
         </div>
 
         <nav className="Nav-Bar">
-          <Link to="/">
-            <button>Home</button>
-          </Link>
-          <Link to="/Holdings">
-            <button>Holdings</button>
-          </Link>
+          <Link to="/"><button>Home</button></Link>
+          <Link to="/Holdings"><button>Holdings</button></Link>
         </nav>
 
         <Routes>
@@ -161,8 +157,6 @@ function App() {
           <Route path="/Holdings" element={<Holdings />} />
           <Route path="/holding-details/:id" element={<HoldingDetails />} />
         </Routes>
-
-        
       </div>
 
       {showBuyModal && (
@@ -211,27 +205,28 @@ function App() {
                   }}
                 />
               </label>
-
-              <label style={{ display: "block", marginBottom: "10px", color: "white" }}>
-                Purchase Date:
-                <input
-                  type="date"
-                  value={purchaseDate}
-                  onChange={(e) => setPurchaseDate(e.target.value)}
-                  style={{
-                    marginLeft: "10px",
-                    padding: "5px",
-                    width: "150px",
-                    background: "#333",
-                    color: "white",
-                    border: "1px solid #555",
-                    borderRadius: "4px",
-                  }}
-                  required
-                />
-              </label>
-
             </div>
+
+
+            <label style={{ display: "block", marginBottom: "10px", color: "white" }}>
+              Date:
+              <input
+                type="text"
+                value={date}
+                onChange={(e) => setdate(e.target.value)}
+                placeholder="Enter Date (dd-mm-yyyy)"
+                style={{
+                  marginLeft: "10px",
+                  padding: "5px",
+                  width: "200px",
+                  background: "#333",
+                  color: "white",
+                  border: "1px solid #555",
+                  borderRadius: "4px",
+                }}
+              />
+            </label>
+
 
             <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "20px" }}>
               <button
