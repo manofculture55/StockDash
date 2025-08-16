@@ -254,24 +254,6 @@ body {
   color: white;
 }
 
-.modal-card button {
-  margin-top: 350px;
-  width: 320px;
-  padding: 10px 20px;
-  border-radius: 10px;
-  background: rgb(17, 167, 50);
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.3s;
-}
-
-.modal-card button:hover {
-  background: rgb(17, 167, 30);
-  box-shadow: 0 0 0 3px rgba(47, 255, 116, 0.384);
-}
-
 
 .clickable-row {
   cursor: pointer;
@@ -280,4 +262,71 @@ body {
 
 .clickable-row:hover {
   background-color: #333;
+}
+
+
+.sell-button {
+  padding: 7px 10px;
+  background: rgb(31, 31, 31);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  color: white;
+  width: 70px;
+  transition: background 0.3s;
+}
+
+.sell-button:hover {
+  background: #c73104ff; /* color after hover */
+}
+
+
+
+/* Live Price Toggle - Inspired by Uiverse.io */
+.live-switch {
+  --secondary-bg: #2d2d2d;
+  --primary-bg: #4caf50;
+  --knob-color: #ccc;
+  --knob-active-color: #fff;
+  position: relative;
+  display: inline-block;
+  width: 3.4em;
+  height: 1.6em;
+}
+
+.live-switch input {
+  display: none;
+}
+
+.live-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--secondary-bg);
+  transition: background-color 0.3s ease;
+  border-radius: 20px;
+}
+
+.live-slider::before {
+  position: absolute;
+  content: "";
+  height: 1.2em;
+  width: 1.2em;
+  left: 0.2em;
+  bottom: 0.2em;
+  background-color: var(--knob-color);
+  border-radius: 50%;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.live-switch input:checked + .live-slider {
+  background-color: var(--primary-bg);
+}
+
+.live-switch input:checked + .live-slider::before {
+  transform: translateX(1.7em);
+  background-color: var(--knob-active-color);
 }

@@ -69,22 +69,41 @@ def get_stock_price():
 
     symbol = company.upper().replace(" ", "")
     exchange_code = "BOM" if exchange.upper() == "BSE" else exchange.upper()
-
     url = f"https://www.google.com/finance/quote/{symbol}:{exchange_code}"
     headers = {"User-Agent": "Mozilla/5.0"}
 
     try:
         response = requests.get(url, headers=headers)
         soup = BeautifulSoup(response.text, "html.parser")
+
+        # Current price & name
         price_element = soup.find("div", class_="YMlKec fxKbKc")
         name_element = soup.find("div", class_="zzDege")
 
-        if price_element and name_element:
-            return jsonify({"name": name_element.text, "price": price_element.text})
+        # Find "Previous close" label and get its value
+        prev_close_label = soup.find("div", string="Previous close")
+        prev_close_element = None
+        if prev_close_label:
+            # Get the parent container, then find the price element in it
+            container = prev_close_label.find_parent("div", class_="gyFHrc")
+            if container:
+                prev_close_element = container.find("div", class_="P6K39c")
+
+        current_price_text = price_element.text if price_element else None
+        prev_close_text = prev_close_element.text if prev_close_element else None
+
+        if current_price_text and name_element:
+            return jsonify({
+                "name": name_element.text,
+                "price": current_price_text,
+                "previous_close": prev_close_text or "N/A"
+            })
+
         return jsonify({"error": "Price or name not found"}), 404
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 # Get all holdings
 @app.route('/api/holdings', methods=['GET'])

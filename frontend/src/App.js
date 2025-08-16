@@ -14,6 +14,9 @@ function App() {
   const [buyQuantity, setBuyQuantity] = useState("");
   const [buyPrice, setBuyPrice] = useState("");
   const [date, setdate] = useState("");
+  const [previousClose, setPreviousClose] = useState("");
+  
+
 
 
   const openModal = () => {
@@ -39,6 +42,7 @@ function App() {
         if (data.price) {
           setPrice(data.price);
           setCompanyFullName(data.name || "");
+          setPreviousClose(data.previous_close || "");
         } else {
           setError("Price not found");
         }
@@ -63,6 +67,7 @@ function App() {
       symbol: company,
       price: `₹${parseFloat(buyPrice).toFixed(2)}`,
       marketPrice: price,
+      previousClose: previousClose,
       quantity: buyQuantity,
       exchange: exchange,
       date: date

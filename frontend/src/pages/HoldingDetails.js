@@ -98,6 +98,14 @@ function HoldingDetails() {
           </tr>
 
           <tr style={{ borderBottom: '1px solid #444' }}>
+            <td style={{ padding: '10px', fontWeight: 'bold' }}>Previous Close</td>
+            <td style={{ padding: '10px' }}>
+              ₹{parseFloat((holding.previousClose || "").toString().replace(/[^\d.-]/g, "")).toFixed(2)}
+            </td>
+          </tr>
+
+
+          <tr style={{ borderBottom: '1px solid #444' }}>
             <td style={{ padding: '10px', fontWeight: 'bold' }}>Total Investment</td>
             <td style={{ padding: '10px' }}>₹{totalInvestment.toFixed(2)}</td>
           </tr>
