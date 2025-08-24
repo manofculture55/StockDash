@@ -2,43 +2,97 @@
   "holdings": [
     {
       "name": "State Bank of India",
-      "symbol": "SBIN",
-      "price": "\u20b9825.50",
-      "marketPrice": "\u20b9825.50",
-      "previousClose": "\u20b9821.85",
-      "quantity": 78,
+      "symbol": "sbin",
+      "price": "\u20b9815.00",
+      "marketPrice": "\u20b9816.25",
+      "previousClose": "825.70",
+      "quantity": 20,
       "exchange": "NSE",
-      "date": "8678",
-      "id": "ac8ffe3905de7da8",
+      "date": "22-22-2025",
+      "id": "de5794a3b35933c5",
       "ticker": "sbin",
-      "avgPrice": 825.5,
+      "avgPrice": 815.0,
       "purchases": [
         {
-          "date": "8678",
-          "quantity": 78,
-          "price": 825.5
+          "date": "22-22-2025",
+          "quantity": 10,
+          "price": 810.0
+        },
+        {
+          "qty": null,
+          "date": "12-02-2023",
+          "quantity": 10,
+          "price": 820.0
         }
-      ]
+      ],
+      "priceChangeAmount": "-9.45",
+      "priceChangePercent": "-1.14%"
     },
     {
-      "name": "Infosys Ltd",
-      "symbol": "INFY",
-      "price": "\u20b91448.00",
-      "marketPrice": "\u20b91,448.00",
-      "previousClose": "\u20b91,426.60",
-      "quantity": 324,
+      "name": "Central Depository Services (India) Ltd",
+      "symbol": "cdsl",
+      "price": "\u20b91570.00",
+      "marketPrice": "\u20b91574.4",
+      "previousClose": "1,569.50",
+      "quantity": 10,
       "exchange": "NSE",
-      "date": "54",
-      "id": "e6401f06d48d1622",
-      "ticker": "infy",
-      "avgPrice": 1448.0,
+      "date": "02-02-1212",
+      "id": "269b168099ad4a50",
+      "ticker": "cdsl",
+      "avgPrice": 1570.0,
       "purchases": [
         {
-          "date": "54",
-          "quantity": 324,
-          "price": 1448.0
+          "date": "02-02-1212",
+          "quantity": 10,
+          "price": 1570.0
         }
-      ]
+      ],
+      "priceChangeAmount": "+4.90",
+      "priceChangePercent": "0.31%"
+    },
+    {
+      "name": "ITC Ltd",
+      "symbol": "ITC",
+      "price": "\u20b9410.00",
+      "marketPrice": "\u20b9398.3",
+      "previousClose": "405.55",
+      "quantity": 10,
+      "exchange": "NSE",
+      "date": "22-12-0000",
+      "id": "38c742af137fc3ad",
+      "ticker": "itc",
+      "avgPrice": 410.0,
+      "purchases": [
+        {
+          "date": "22-12-0000",
+          "quantity": 10,
+          "price": 410.0
+        }
+      ],
+      "priceChangeAmount": "-7.25",
+      "priceChangePercent": "-1.79%"
+    },
+    {
+      "name": "National Securities Depository Ltd",
+      "symbol": "544467",
+      "price": "\u20b91200.00",
+      "marketPrice": "\u20b91275.4",
+      "previousClose": "1,246.35",
+      "quantity": 10,
+      "exchange": "BSE",
+      "date": "54-78-2154",
+      "id": "cbb88a6f635e121f",
+      "ticker": "544467",
+      "avgPrice": 1200.0,
+      "purchases": [
+        {
+          "date": "54-78-2154",
+          "quantity": 10,
+          "price": 1200.0
+        }
+      ],
+      "priceChangeAmount": "+29.05",
+      "priceChangePercent": "2.33%"
     }
   ]
 }

@@ -4,9 +4,19 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Holdings from "./pages/Holdings";
 import HoldingDetails from './pages/HoldingDetails';
 
+// Helper function to detect exchange based on ticker
+const detectExchange = (ticker) => {
+  // If ticker contains only digits, it's BSE (e.g., 500209, 537641)
+  if (/^\d+$/.test(ticker.trim())) {
+    return "BSE";
+  }
+  // Otherwise, it's NSE (e.g., INFY, SBIN, AXISBANK)
+  return "NSE";
+};
+
+
 function App() {
-  const [company, setCompany] = useState("SBIN");
-  const [exchange, setExchange] = useState("NSE");
+  const [company, setCompany] = useState("");
   const [price, setPrice] = useState("");
   const [error, setError] = useState("");
   const [companyFullName, setCompanyFullName] = useState("");
@@ -15,7 +25,9 @@ function App() {
   const [buyPrice, setBuyPrice] = useState("");
   const [date, setdate] = useState("");
   const [previousClose, setPreviousClose] = useState("");
-  
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  let suggestionsTimeout;
 
 
 
@@ -32,11 +44,61 @@ function App() {
     setdate("");
   };
 
+  const getSuggestions = async (query) => {
+    if (query.length < 1) return [];
+    
+    try {
+      const response = await fetch(`http://localhost:5000/api/suggestions?q=${encodeURIComponent(query)}`);
+      const data = await response.json();
+      return data.suggestions || [];
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+      return [];
+    }
+  };
+
+  // Handle input change with autocomplete
+  const handleCompanyInputChange = (e) => {
+    const query = e.target.value.trim();
+    setCompany(e.target.value.toUpperCase());
+    
+    // Clear previous timeout
+    if (suggestionsTimeout) {
+      clearTimeout(suggestionsTimeout);
+    }
+    
+    if (query.length >= 1) {
+      suggestionsTimeout = setTimeout(async () => {
+        const suggestionList = await getSuggestions(query);
+        setSuggestions(suggestionList);
+        setShowSuggestions(true);
+      }, 300);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  // Handle suggestion selection
+  const handleSuggestionClick = (ticker) => {
+    setCompany(ticker);
+    setSuggestions([]);
+    setShowSuggestions(false);
+  };
+
+  // Hide suggestions when clicking outside
+  const hideSuggestions = () => {
+    setTimeout(() => {
+      setShowSuggestions(false);
+    }, 200);
+  };
+
+
   const fetchPrice = () => {
     setPrice("");
     setError("");
 
-    fetch(`http://localhost:5000/api/stock-price?company=${company}&exchange=${exchange}`)
+    fetch(`http://localhost:5000/api/stock-price?company=${company}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.price) {
@@ -50,28 +112,31 @@ function App() {
       .catch(() => setError("Failed to fetch"));
   };
 
-  const handleBuyStock = () => {
-    const qty = parseInt(buyQuantity, 10);
-    if (!qty || qty <= 0) {
-      alert("Please enter a valid quantity");
-      return;
-    }
+const handleBuyStock = () => {
+  const qty = parseInt(buyQuantity, 10);
+  if (!qty || qty <= 0) {
+    alert("Please enter a valid quantity");
+    return;
+  }
 
-    if (!buyPrice || buyPrice <= 0) {
-      alert("Please enter a valid buying price");
-      return;
-    }
+  if (!buyPrice || buyPrice <= 0) {
+    alert("Please enter a valid buying price");
+    return;
+  }
 
-    const holdingData = {
-      name: companyFullName || company,
-      symbol: company,
-      price: `₹${parseFloat(buyPrice).toFixed(2)}`,
-      marketPrice: price,
-      previousClose: previousClose,
-      quantity: buyQuantity,
-      exchange: exchange,
-      date: date
-    };
+  // Auto-detect exchange based on ticker
+  const detectedExchange = detectExchange(company);
+
+  const holdingData = {
+    name: companyFullName || company,
+    symbol: company,
+    price: `₹${parseFloat(buyPrice).toFixed(2)}`,
+    marketPrice: price,
+    previousClose: previousClose,
+    quantity: buyQuantity,
+    exchange: detectedExchange,  // ✅ Auto-detected exchange
+    date: date
+  };
 
     fetch("http://localhost:5000/api/holdings", {
       method: "POST",
@@ -119,22 +184,36 @@ function App() {
                               7.5-7.5-3.365-7.5-7.5z" />
                     </svg>
                     <input
-                      placeholder="Search"
+                      placeholder="Enter ticker"
                       type="search"
                       className="search-input"
                       value={company}
-                      onChange={(e) => setCompany(e.target.value)}
+                      onChange={handleCompanyInputChange}  // ✅ CHANGED
+                      onBlur={hideSuggestions}            // ✅ ADDED
+                      onFocus={() => {                    // ✅ ADDED
+                        if (company.length >= 1) {
+                          getSuggestions(company).then(suggestionList => {
+                            setSuggestions(suggestionList);
+                            setShowSuggestions(true);
+                          });
+                        }
+                      }}
                     />
+                      {showSuggestions && suggestions.length > 0 && (
+                        <div className="suggestions">
+                          {suggestions.map((item, index) => (
+                            <div
+                              key={index}
+                              className="suggestion-item"
+                              onClick={() => handleSuggestionClick(item.ticker)}
+                            >
+                              <div className="suggestion-ticker">{item.display_ticker || item.ticker}</div>
+                              <div className="suggestion-company">{item.company_name}</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                   </div>
-
-                  <select
-                    className="dropdown-dark"
-                    value={exchange}
-                    onChange={(e) => setExchange(e.target.value)}
-                  >
-                    <option value="NSE">NSE</option>
-                    <option value="BSE">BSE</option>
-                  </select>
 
                   <button className="button-dark" onClick={fetchPrice}>
                     Get Stock Price

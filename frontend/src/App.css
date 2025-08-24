@@ -104,6 +104,51 @@ body {
   height: 1rem;
 }
 
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e1e5e9;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+  color: #333;  /* ✅ Dark text for visibility */
+}
+
+.suggestion-item:hover {
+  background-color: #f8f9fa;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-ticker {
+  font-weight: bold;
+  color: #667eea;
+  font-size: 0.9rem;
+}
+
+.suggestion-company {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+
+
 /* Form Inputs */
 .inputs-container {
   max-width: 400px;
@@ -125,19 +170,6 @@ body {
   outline: none;
 }
 
-.dropdown-dark {
-  width: 40%;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  font-size: 13px;
-  background: #222;
-  color: #fff;
-}
-
-.dropdown-dark:hover {
-  background: #000;
-}
 
 /* Submit Button */
 .button-dark {

@@ -1,0 +1,47 @@
+{
+    "State Bank of India": {
+        "tickers": [
+            "SBIN"
+        ],
+        "screener_urls": {
+            "SBIN": "https://www.screener.in/company/SBIN/consolidated/"
+        },
+        "kotak_url": "https://www.kotaksecurities.com/stocks/state-bank-of-india/"
+    },
+    "Central Depository Services (India) Ltd": {
+        "tickers": [
+            "CDSL"
+        ],
+        "screener_urls": {
+            "CDSL": "https://www.screener.in/company/CDSL/consolidated/"
+        },
+        "kotak_url": "https://www.kotaksecurities.com/stocks/central-depository-services-india-ltd/"
+    },
+    "Infosys Ltd": {
+        "tickers": [
+            "500209"
+        ],
+        "screener_urls": {
+            "500209": "https://www.screener.in/company/500209/consolidated/"
+        },
+        "kotak_url": "https://www.kotaksecurities.com/stocks/infosys-ltd/"
+    },
+    "ITC Ltd": {
+        "tickers": [
+            "ITC"
+        ],
+        "screener_urls": {
+            "ITC": "https://www.screener.in/company/ITC/consolidated/"
+        },
+        "kotak_url": "https://www.kotaksecurities.com/stocks/itc-ltd/"
+    },
+    "National Securities Depository Ltd": {
+        "tickers": [
+            "544467"
+        ],
+        "screener_urls": {
+            "544467": "https://www.screener.in/company/544467/consolidated/"
+        },
+        "kotak_url": "https://www.kotaksecurities.com/stocks/bse-national-securities-depository/"
+    }
+}
