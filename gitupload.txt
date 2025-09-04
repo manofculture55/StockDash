@@ -1,6 +1,0 @@
-git init
-git remote add origin https://github.com/manofculture55/StockDash.git
-git add .
-git commit -m "V4 - Improved UI,  holdings page & Buy Sell mechanism implemented"
-git branch -M main
-git push -u origin main
