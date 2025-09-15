@@ -1,0 +1,94 @@
+{
+    "State Bank of India": {
+        "tickers": [
+            "SBIN"
+        ],
+        "screener_urls": {
+            "SBIN": "https://www.screener.in/company/SBIN/consolidated/"
+        },
+        "kotak_url": "https://www.kotaksecurities.com/stocks/state-bank-of-india/"
+    },
+    "Central Depository Services (India) Ltd": {
+        "tickers": [
+            "CDSL"
+        ],
+        "screener_urls": {
+            "CDSL": "https://www.screener.in/company/CDSL/consolidated/"
+        },
+        "kotak_url": "https://www.kotaksecurities.com/stocks/central-depository-services-india-ltd/"
+    },
+    "Infosys Ltd": {
+        "tickers": [
+            "500209",
+            "INFY"
+        ],
+        "screener_urls": {
+            "500209": "https://www.screener.in/company/500209/consolidated/",
+            "INFY": "https://www.screener.in/company/INFY/consolidated/"
+        },
+        "kotak_url": "https://www.kotaksecurities.com/stocks/infosys-ltd/"
+    },
+    "ITC Ltd": {
+        "tickers": [
+            "ITC"
+        ],
+        "screener_urls": {
+            "ITC": "https://www.screener.in/company/ITC/consolidated/"
+        },
+        "kotak_url": "https://www.kotaksecurities.com/stocks/itc-ltd/"
+    },
+    "National Securities Depository Ltd": {
+        "tickers": [
+            "544467"
+        ],
+        "screener_urls": {
+            "544467": "https://www.screener.in/company/544467/consolidated/"
+        },
+        "kotak_url": "https://www.kotaksecurities.com/stocks/bse-national-securities-depository/"
+    },
+    "Axis Bank Ltd": {
+        "tickers": [
+            "AXISBANK"
+        ],
+        "screener_urls": {
+            "AXISBANK": "https://www.screener.in/company/AXISBANK/consolidated/"
+        },
+        "kotak_url": "https://www.kotaksecurities.com/stocks/axis-bank-ltd/"
+    },
+    "REC Ltd": {
+        "tickers": [
+            "RECLTD"
+        ],
+        "screener_urls": {
+            "RECLTD": "https://www.screener.in/company/RECLTD/consolidated/"
+        },
+        "kotak_url": "https://www.kotaksecurities.com/stocks/rec-ltd/"
+    },
+    "ICICI Bank Ltd": {
+        "tickers": [
+            "ICICIBANK"
+        ],
+        "screener_urls": {
+            "ICICIBANK": "https://www.screener.in/company/ICICIBANK/consolidated/"
+        },
+        "kotak_url": "https://www.kotaksecurities.com/stocks/icici-bank-ltd/"
+    },
+    "Wipro Ltd": {
+        "tickers": [
+            "WIPRO"
+        ],
+        "screener_urls": {
+            "WIPRO": "https://www.screener.in/company/WIPRO/consolidated/"
+        },
+        "kotak_url": "https://www.kotaksecurities.com/stocks/wipro-ltd/"
+    },
+    "MRF Ltd": {
+        "tickers": [
+            "MRF"
+        ],
+        "screener_urls": {
+            "MRF": "https://www.screener.in/company/MRF/consolidated/"
+        },
+        "kotak_url": "https://www.kotaksecurities.com/stocks/mrf-ltd/"
+    }
+}

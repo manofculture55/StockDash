@@ -1,0 +1,1267 @@
+/* ============================================================================
+   GLOBAL STYLES & FONTS
+   ============================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #000;
+  font-family: 'Roboto', sans-serif;
+  color: #fff;
+}
+
+/* ============================================================================
+   APP.JS COMPONENT STYLES
+   ============================================================================ */
+
+/* App Container */
+.app-container {
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* Header & Navigation */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.app-title {
+  font-size: 32px;
+  margin: 0;
+}
+
+.navigation {
+  display: flex;
+  font-family: sans-serif;
+  gap: 90px;
+}
+
+.nav-button {
+  font-size: 21px;
+  color: #e1e1e1;
+  font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  text-transform: uppercase;
+  transition: color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.nav-button:hover {
+  color: #fff;
+}
+
+.nav-button::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0%;
+  height: 2px;
+  background: linear-gradient(144deg, #AF40FF, #5B42F3 50%, #00DDEB);
+  transition: width 0.4s, left 0.4s;
+}
+
+.nav-button:hover::after {
+  width: 100%;
+  left: 0;
+}
+
+/* Search Section */
+.search-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 50px 0;
+}
+
+.search-container {
+  display: flex;
+  flex-direction: column;    /* CHANGED: from row to column */
+  align-items: center;       /* CHANGED: center both elements */
+  gap: 16px;                /* CHANGED: reduced gap for better spacing */
+  max-width: 600px;
+  width: 100%;
+}
+
+.search-input-wrapper {
+  position: relative;
+  width: 100%;              /* ADDED: full width for search bar */
+  max-width: 450px;         /* ADDED: limit max width for better look */
+}
+
+.search-input {
+  width: 100%;
+  height: 60px;
+  padding: 0 1rem 0 3rem;
+  border: 2px solid transparent;
+  border-radius: 35px;
+  background-color: #252525;
+  color: #fff;
+  font-size: 16px;
+  transition: 0.3s;
+  outline: none;              /* ADDED: Remove focus outline */
+}
+
+.search-input:focus {
+  outline: none;              /* ADDED: Ensure no outline on focus */
+  border: 2px solid transparent; /* Keep border transparent */
+  background-color: #000;
+  box-shadow: 0 0 0 4px rgb(43, 43, 43);
+}
+
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  fill: #9e9ea7;
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Suggestions Dropdown - unchanged */
+.suggestions-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e1e5e9;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+  color: #333;
+}
+
+.suggestion-item:hover {
+  background-color: #f8f9fa;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-ticker {
+  font-weight: bold;
+  color: #5B42F3;
+  font-size: 0.9rem;
+}
+
+.suggestion-company {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+/* Fetch Button - now centered under search bar */
+.fetch-button {
+  padding: 16px 40px;
+  border-radius: 10px;
+  background: #6b57f1;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  /* Button will automatically center due to parent container alignment */
+}
+
+.fetch-button:hover {
+  background: #4A35E0;
+}
+
+.fetch-button:disabled {
+  background: #2e2e2e;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+
+
+/* Results Section */
+.results-section {
+  margin: 40px auto;
+  max-width: 400px;
+}
+
+.stock-card {
+  background: #1f1f1f;
+  border: 2px solid #333;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stock-card:hover {
+  border-color: #5B42F3;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.stock-info {
+  margin-bottom: 20px;
+}
+
+.company-name {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.stock-price {
+  font-size: 18px;
+  color: #00FF00;
+  margin-bottom: 4px;
+}
+
+.previous-close {
+  font-size: 14px;
+  color: #999;
+}
+
+.buy-button {
+  background: #00AA00;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.buy-button:hover {
+  background: #008800;
+  transform: translateY(-2px);
+}
+
+/* Error Display */
+.error-section {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.error-message {
+  color: #ff5e5e;
+  font-size: 16px;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #1a1a1a;
+  border: 2px solid #333;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #333;
+}
+
+.modal-title {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.modal-close-button {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.3s;
+}
+
+.modal-close-button:hover {
+  color: #ff5e5e;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.current-price {
+  color: #00FF00;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  color: white;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  background: #333;
+  color: white;
+  border: 1px solid #555;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #5B42F3;
+  box-shadow: 0 0 0 2px rgba(91, 66, 243, 0.2);
+}
+
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 20px 24px;
+  border-top: 1px solid #333;
+}
+
+.cancel-button {
+  padding: 10px 20px;
+  background: #666;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.cancel-button:hover {
+  background: #555;
+}
+
+.confirm-button {
+  padding: 10px 20px;
+  background: #00AA00;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.confirm-button:hover {
+  background: #008800;
+}
+
+/* ============================================================================
+   HOLDINGS.JS COMPONENT STYLES
+   ============================================================================ */
+
+.holdings-container {
+  padding: 20px;
+  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.holdings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.holdings-title {
+  color: white;
+  font-size: 28px;
+  margin: 0;
+}
+
+.holdings-loading {
+  text-align: center;
+  color: white;
+  font-size: 18px;
+  margin-top: 50px;
+}
+
+/* Live Update Toggle */
+.live-update-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #333;
+  transition: 0.3s;
+  border-radius: 12px;
+}
+
+.toggle-slider::before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background-color: #4CAF50;
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(24px);
+}
+
+.toggle-label {
+  color: white;
+  font-weight: 500;
+}
+
+/* Portfolio Summary */
+.portfolio-summary {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 30px;
+}
+
+.summary-header {
+  margin-bottom: 20px;
+}
+
+.total-value {
+  text-align: center;
+}
+
+.total-value h3 {
+  color: #999;
+  font-size: 16px;
+  margin: 0 0 8px 0;
+  font-weight: normal;
+}
+
+.value-amount {
+  color: #00FF00;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.summary-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.metric-item {
+  text-align: center;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.metric-item label {
+  display: block;
+  color: #999;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.metric-value {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.metric-value.positive {
+  color: #00FF00;
+}
+
+.metric-value.negative {
+  color: #FF4C4C;
+}
+
+.metric-value small {
+  display: block;
+  font-size: 14px;
+  margin-top: 4px;
+  opacity: 0.8;
+}
+
+/* No Holdings State */
+.no-holdings {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.empty-state h3 {
+  color: white;
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.empty-state p {
+  color: #999;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Holdings Table */
+.holdings-table-container {
+  background: #1a1a1a;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #333;
+}
+
+.holdings-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: white;
+}
+
+.holdings-table th {
+  background: #2a2a2a;
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #ccc;
+  border-bottom: 1px solid #333;
+}
+
+.holding-row {
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid #333;
+}
+
+.holding-row:hover {
+  background-color: rgba(91, 66, 243, 0.1);
+}
+
+.holding-row:last-child {
+  border-bottom: none;
+}
+
+.holdings-table td {
+  padding: 16px;
+  vertical-align: top;
+}
+
+.company-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.company-name {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.company-details {
+  font-size: 12px;
+  color: #999;
+}
+
+.price-info {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.market-price {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.price-change {
+  font-size: 12px;
+}
+
+.price-change.positive {
+  color: #00FF00;
+}
+
+.price-change.negative {
+  color: #FF4C4C;
+}
+
+.returns-info {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.returns-amount {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.returns-percent {
+  font-size: 12px;
+}
+
+.returns-info.positive {
+  color: #00FF00;
+}
+
+.returns-info.negative {
+  color: #FF4C4C;
+}
+
+.value-info {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.current-value {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.current-value.positive {
+  color: #00FF00;
+}
+
+.current-value.negative {
+  color: #FF4C4C;
+}
+
+.invested-value {
+  font-size: 12px;
+  color: #999;
+}
+
+.actions-cell {
+  text-align: center;
+}
+
+.sell-button {
+  background: #FF4C4C;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.sell-button:hover {
+  background: #FF3333;
+}
+
+/* Sell Modal */
+.sell-modal {
+  background: #1a1a1a;
+  border: 2px solid #333;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+}
+
+.holding-info {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.holding-info p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.quantity-input {
+  width: 100%;
+  padding: 10px;
+  background: #333;
+  color: white;
+  border: 1px solid #555;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.quantity-input:focus {
+  outline: none;
+  border-color: #FF4C4C;
+}
+
+.sell-preview {
+  background: rgba(255, 76, 76, 0.1);
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 12px;
+}
+
+.sell-preview p {
+  margin: 0;
+  color: #FF4C4C;
+  font-weight: 600;
+}
+
+.confirm-sell-button {
+  background: #FF4C4C;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.confirm-sell-button:hover:not(:disabled) {
+  background: #FF3333;
+}
+
+.confirm-sell-button:disabled {
+  background: #666;
+  cursor: not-allowed;
+}
+
+/* Error Display */
+.error-section {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.retry-button {
+  background: #5B42F3;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.retry-button:hover {
+  background: #4A35D1;
+}
+
+/* ============================================================================
+   HOLDINGDETAILS.JS COMPONENT STYLES
+   ============================================================================ */
+
+.details-container {
+  padding: 20px;
+  min-height: 100vh;
+  color: white;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.details-loading {
+  text-align: center;
+  color: white;
+  font-size: 18px;
+  margin-top: 50px;
+}
+
+.details-error {
+  text-align: center;
+  color: #ff5e5e;
+  font-size: 18px;
+  margin-top: 50px;
+}
+
+.back-button {
+  background: #333;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  background: #444;
+  transform: translateX(-2px);
+}
+
+/* Header Section */
+.details-header {
+  margin-bottom: 30px;
+}
+
+.details-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+}
+
+.details-symbol {
+  color: #999;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+.exchange-info {
+  color: #999;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.exchange-info strong {
+  color: white;
+}
+
+/* Portfolio Summary */
+.portfolio-summary {
+  margin-bottom: 30px;
+}
+
+.details-table {
+  width: 100%;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  border-collapse: collapse;
+  overflow: hidden;
+}
+
+.details-table .section-header {
+  background: rgba(91, 66, 243, 0.2);
+  color: #5B42F3;
+  font-weight: bold;
+  text-align: center;
+  padding: 16px;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #333;
+}
+
+.details-table tr {
+  border-bottom: 1px solid #333;
+}
+
+.details-table tr:last-child {
+  border-bottom: none;
+}
+
+.details-label {
+  padding: 12px 16px;
+  font-weight: 600;
+  color: #ccc;
+  width: 40%;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.details-value {
+  padding: 12px 16px;
+  color: white;
+  font-weight: 500;
+}
+
+.details-value.positive {
+  color: #00FF00;
+}
+
+.details-value.negative {
+  color: #FF4C4C;
+}
+
+/* Ratios Section */
+.ratios-section {
+  margin: 40px 0;
+}
+
+.ratios-title {
+  color: white;
+  font-size: 24px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #333;
+  padding-bottom: 12px;
+}
+
+.loading-indicator {
+  font-size: 14px;
+  color: #999;
+  font-style: italic;
+}
+
+.ratios-error {
+  background: rgba(255, 94, 94, 0.1);
+  border: 1px solid #ff5e5e;
+  color: #ff5e5e;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ratios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.ratio-category {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.category-title {
+  color: #5B42F3;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #5B42F3;
+  padding-bottom: 8px;
+}
+
+.ratios-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ratio-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ratio-row:last-child {
+  border-bottom: none;
+}
+
+.ratio-label {
+  padding: 10px 0;
+  color: #ccc;
+  font-size: 14px;
+  width: 60%;
+}
+
+.ratio-value {
+  padding: 10px 0;
+  color: white;
+  font-weight: 600;
+  text-align: right;
+  font-size: 14px;
+}
+
+/* Purchase History */
+.purchase-history-section {
+  margin-top: 30px;
+}
+
+.purchase-history-container {
+  padding: 0;
+}
+
+.purchase-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #1a1a1a;
+  margin: 0;
+}
+
+.purchase-history-table thead {
+  background: #2a2a2a;
+}
+
+.purchase-history-table th {
+  padding: 12px;
+  text-align: left;
+  color: #ccc;
+  font-weight: 600;
+  font-size: 14px;
+  border-bottom: 1px solid #333;
+}
+
+.purchase-history-table td {
+  padding: 10px 12px;
+  color: white;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.purchase-history-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  
+  .search-container {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .holdings-table-container {
+    overflow-x: auto;
+  }
+  
+  .holdings-table {
+    min-width: 600px;
+  }
+  
+  .summary-metrics {
+    grid-template-columns: 1fr;
+  }
+  
+  .ratios-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .details-container {
+    padding: 15px;
+  }
+  
+  .details-title {
+    font-size: 24px;
+  }
+  
+  .modal-content {
+    margin: 20px;
+    width: calc(100% - 40px);
+  }
+}
+
+@media (max-width: 480px) {
+  .app-title {
+    font-size: 24px;
+  }
+  
+  .navigation {
+    gap: 20px;
+  }
+  
+  .nav-button {
+    font-size: 16px;
+  }
+  
+  .search-input {
+    height: 44px;
+    font-size: 14px;
+  }
+  
+  .fetch-button {
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+  
+  .value-amount {
+    font-size: 24px;
+  }
+  
+  .metric-value {
+    font-size: 16px;
+  }
+}
+
+
+
+/* ============================================================================
+   CUSTOM LOADER STYLES (ADD TO APP.CSS)
+   ============================================================================ */
+/* Glowing border effect for the entire ratios section */
+.loader {
+  color: rgb(189, 189, 189);
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-size: 25px;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 40px;
+  padding: 10px 10px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  gap: 10px;
+}
+
+.loader p {
+  margin: 0;
+  line-height: 40px;
+}
+
+.words {
+  overflow: hidden;
+  position: relative;
+  height: 40px;
+  width: auto;
+  min-width: 120px;
+}
+
+.words::after {
+   display: none;
+}
+
+.word {
+  display: block;
+  height: 40px;
+  padding-left: 6px;
+  color: #8d5cff;
+  animation: spin_4991 4s infinite;
+  line-height: 40px;
+  white-space: nowrap;
+}
+
+@keyframes spin_4991 {
+  10% {
+    -webkit-transform: translateY(-102%);
+    transform: translateY(-102%);
+  }
+  25% {
+    -webkit-transform: translateY(-100%);
+    transform: translateY(-100%);
+  }
+  35% {
+    -webkit-transform: translateY(-202%);
+    transform: translateY(-202%);
+  }
+  50% {
+    -webkit-transform: translateY(-200%);
+    transform: translateY(-200%);
+  }
+  60% {
+    -webkit-transform: translateY(-302%);
+    transform: translateY(-302%);
+  }
+  75% {
+    -webkit-transform: translateY(-300%);
+    transform: translateY(-300%);
+  }
+  85% {
+    -webkit-transform: translateY(-402%);
+    transform: translateY(-402%);
+  }
+  100% {
+    -webkit-transform: translateY(-400%);
+    transform: translateY(-400%);
+  }
+}
+
+/* Glowing border effect for the entire ratios section */
+/* Converted from circular to bottom-only rectangular glow */
+.loading-glow-border {
+  position: relative;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: linear-gradient(#1a1a1a, #1a1a1a) padding-box,
+              linear-gradient(45deg, #fff, #8d5cff, #471eec, #d60a47) border-box;
+  animation: bottom-glow-rotate 2s linear infinite;
+  padding: 20px;
+  text-align: center;
+  margin: 20px 0;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes bottom-glow-rotate {
+  0% {
+    box-shadow:
+      inset 0 -10px 20px 0 #fff,
+      inset 0 -20px 30px 0 #ad5fff,
+      inset 0 -60px 60px 0 #471eec;
+  }
+  50% {
+    box-shadow:
+      inset 0 -10px 20px 0 #fff,
+      inset 0 -20px 10px 0 #d60a47,
+      inset 0 -40px 60px 0 #311e80;
+  }
+  100% {
+    box-shadow:
+      inset 0 -10px 20px 0 #fff,
+      inset 0 -20px 30px 0 #ad5fff,
+      inset 0 -60px 60px 0 #471eec;
+  }
+}

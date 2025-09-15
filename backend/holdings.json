@@ -1,0 +1,48 @@
+{
+  "holdings": [
+    {
+      "name": "Central Depository Services (India) Ltd",
+      "symbol": "CDSL",
+      "ticker": "cdsl",
+      "price": "\u20b91550.00",
+      "marketPrice": "\u20b91553.6",
+      "previousClose": "1,545.80",
+      "quantity": 10,
+      "exchange": "NSE",
+      "date": "2025-09-15",
+      "id": "8c79a043581fcdcb",
+      "avgPrice": 1550.0,
+      "purchases": [
+        {
+          "date": "2025-09-15",
+          "quantity": 10,
+          "price": 1550.0
+        }
+      ],
+      "priceChangeAmount": "+7.80",
+      "priceChangePercent": "0.50%"
+    },
+    {
+      "name": "State Bank of India",
+      "symbol": "SBIN",
+      "ticker": "sbin",
+      "price": "\u20b9830.00",
+      "marketPrice": "\u20b9824.75",
+      "previousClose": "823.55",
+      "quantity": 10,
+      "exchange": "NSE",
+      "date": "2025-09-15",
+      "id": "3f320f0e06d0bc33",
+      "avgPrice": 830.0,
+      "purchases": [
+        {
+          "date": "2025-09-15",
+          "quantity": 10,
+          "price": 830.0
+        }
+      ],
+      "priceChangeAmount": "+1.20",
+      "priceChangePercent": "0.15%"
+    }
+  ]
+}
