@@ -90,5 +90,14 @@
             "MRF": "https://www.screener.in/company/MRF/consolidated/"
         },
         "kotak_url": "https://www.kotaksecurities.com/stocks/mrf-ltd/"
+    },
+    "Tata Consultancy Services Ltd": {
+        "tickers": [
+            "TCS"
+        ],
+        "screener_urls": {
+            "TCS": "https://www.screener.in/company/TCS/consolidated/"
+        },
+        "kotak_url": "https://www.kotaksecurities.com/stocks/tata-consultancy-services-ltd/"
     }
 }
