@@ -192,7 +192,7 @@ function App() {
         {/* Header */}
         <header className="app-header">
           <div className="title-container">
-            <h1 className="app-title">Asset management portfolio</h1>
+            <h1 className="app-title">Stock Market Dashboard</h1>
           </div>
 
           <nav className="navigation">
