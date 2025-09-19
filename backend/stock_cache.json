@@ -64,15 +64,6 @@
         },
         "kotak_url": "https://www.kotaksecurities.com/stocks/rec-ltd/"
     },
-    "ICICI Bank Ltd": {
-        "tickers": [
-            "ICICIBANK"
-        ],
-        "screener_urls": {
-            "ICICIBANK": "https://www.screener.in/company/ICICIBANK/consolidated/"
-        },
-        "kotak_url": "https://www.kotaksecurities.com/stocks/icici-bank-ltd/"
-    },
     "Wipro Ltd": {
         "tickers": [
             "WIPRO"
@@ -90,5 +81,14 @@
             "MRF": "https://www.screener.in/company/MRF/consolidated/"
         },
         "kotak_url": "https://www.kotaksecurities.com/stocks/mrf-ltd/"
+    },
+    "Adani Power Ltd": {
+        "tickers": [
+            "ADANIPOWER"
+        ],
+        "screener_urls": {
+            "ADANIPOWER": "https://www.screener.in/company/ADANIPOWER/consolidated/"
+        },
+        "kotak_url": "https://www.kotaksecurities.com/stocks/bse-adani-power-ltd/"
     }
 }

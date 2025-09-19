@@ -5,8 +5,8 @@
       "symbol": "CDSL",
       "ticker": "cdsl",
       "price": "\u20b91550.00",
-      "marketPrice": "\u20b91553.6",
-      "previousClose": "1,545.80",
+      "marketPrice": "\u20b91588.3",
+      "previousClose": "1,568.90",
       "quantity": 10,
       "exchange": "NSE",
       "date": "2025-09-15",
@@ -19,10 +19,30 @@
           "price": 1550.0
         }
       ],
-      "priceChangeAmount": "+7.80",
-      "priceChangePercent": "0.50%"
+      "priceChangeAmount": "+19.40",
+      "priceChangePercent": "1.24%"
+    },
+    {
+      "name": "Adani Power Ltd",
+      "symbol": "ADANIPOWER",
+      "ticker": "adanipower",
+      "price": "\u20b9670.00",
+      "marketPrice": "\u20b9677.7",
+      "previousClose": "631.35",
+      "quantity": 10,
+      "exchange": "NSE",
+      "date": "2025-09-19",
+      "id": "2d222e226b2b3b80",
+      "avgPrice": 670.0,
+      "purchases": [
+        {
+          "date": "2025-09-19",
+          "quantity": 10,
+          "price": 670.0
+        }
+      ],
+      "priceChangeAmount": "+46.35",
+      "priceChangePercent": "7.34%"
     }
-  
-    
   ]
 }
