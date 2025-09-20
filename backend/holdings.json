@@ -5,8 +5,8 @@
       "symbol": "CDSL",
       "ticker": "cdsl",
       "price": "\u20b91550.00",
-      "marketPrice": "\u20b91553.6",
-      "previousClose": "1,545.80",
+      "marketPrice": "\u20b91582",
+      "previousClose": "1,588.30",
       "quantity": 10,
       "exchange": "NSE",
       "date": "2025-09-15",
@@ -19,16 +19,16 @@
           "price": 1550.0
         }
       ],
-      "priceChangeAmount": "+7.80",
-      "priceChangePercent": "0.50%"
+      "priceChangeAmount": "-6.30",
+      "priceChangePercent": "-0.40%"
     },
     {
       "name": "State Bank of India",
       "symbol": "SBIN",
       "ticker": "sbin",
       "price": "\u20b9830.00",
-      "marketPrice": "\u20b9824.75",
-      "previousClose": "823.55",
+      "marketPrice": "\u20b9862.35",
+      "previousClose": "854.35",
       "quantity": 10,
       "exchange": "NSE",
       "date": "2025-09-15",
@@ -41,8 +41,8 @@
           "price": 830.0
         }
       ],
-      "priceChangeAmount": "+1.20",
-      "priceChangePercent": "0.15%"
+      "priceChangeAmount": "+8.00",
+      "priceChangePercent": "0.94%"
     }
   ]
 }

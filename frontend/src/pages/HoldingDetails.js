@@ -1,8 +1,8 @@
 /**
  * HoldingDetails Component
  * Displays detailed information about a specific stock holding including
- * portfolio metrics, financial ratios, and purchase history
- * ENHANCED: Progressive Loading for Better UX
+ * portfolio metrics, financial ratios, quarterly results, and purchase history
+ * ENHANCED: Progressive Loading for Better UX + Quarterly Results
  */
 
 import React, { useState, useEffect } from 'react';
@@ -19,16 +19,22 @@ function HoldingDetails() {
   const [ratiosLoading, setRatiosLoading] = useState(false);
   const [error, setError] = useState('');
   const [ratiosError, setRatiosError] = useState('');
+  
+  // NEW: Quarterly results state
+  const [quarterlyData, setQuarterlyData] = useState(null);
+  const [quarterlyLoading, setQuarterlyLoading] = useState(false);
+  const [quarterlyError, setQuarterlyError] = useState('');
 
   // MODIFIED: Fetch holding details with progressive loading
   useEffect(() => {
     fetchHoldingData();
   }, [id]);
 
-  // MODIFIED: Separate ratios loading after basic data is shown
+  // MODIFIED: Separate ratios and quarterly loading after basic data is shown
   useEffect(() => {
     if (basicDataLoaded && holding && (holding.ticker || holding.symbol)) {
       fetchFinancialRatios(holding.ticker || holding.symbol);
+      fetchQuarterlyResults(holding.ticker || holding.symbol); // NEW: Fetch quarterly data
     }
   }, [basicDataLoaded, holding]);
 
@@ -77,6 +83,33 @@ function HoldingDetails() {
       setRatiosError(`Network error: ${err.message}`);
     } finally {
       setRatiosLoading(false);  // Hide loader
+    }
+  };
+
+  // NEW: Fetch quarterly results function
+  const fetchQuarterlyResults = async (ticker) => {
+    if (!ticker) return;
+    
+    setQuarterlyLoading(true);
+    setQuarterlyError('');
+    
+    try {
+      const response = await fetch(`http://localhost:5000/api/quarterly-results/${ticker.toUpperCase()}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.quarterly_data && Object.keys(data.quarterly_data).length > 0) {
+          setQuarterlyData(data.quarterly_data);
+        } else {
+          setQuarterlyError('No quarterly data available');
+        }
+      } else {
+        setQuarterlyError(`Failed to fetch quarterly data: ${response.status}`);
+      }
+    } catch (error) {
+      setQuarterlyError(`Network error: ${error.message}`);
+    } finally {
+      setQuarterlyLoading(false);
     }
   };
 
@@ -270,7 +303,7 @@ function HoldingDetails() {
         {/* Just the animated loader - no title when loading */}
         {ratiosLoading && (
           <div className="loader">
-            <p>loading</p>
+            <p>Loading</p>
             <div className="words">
               <span className="word">Report</span>
               <span className="word">Ratios</span>
@@ -317,6 +350,86 @@ function HoldingDetails() {
         )}
       </section>
 
+      {/* NEW: Quarterly Results Section */}
+      <section className={`quarterly-section ${quarterlyLoading ? 'loading-glow-border' : ''}`}>
+        {/* Only show title when NOT loading */}
+        {!quarterlyLoading && (
+          <h3 className="quarterly-title">Quarterly Results</h3>
+        )}
+
+        {/* Quarterly loader */}
+        {quarterlyLoading && (
+          <div className="loader">
+            <p>Loading</p>
+            <div className="words">
+              <span className="word">Quarterly</span>
+              <span className="word">Results</span>
+              <span className="word">Sales</span>
+              <span className="word">Profits</span>
+              <span className="word">EPS</span>
+            </div>
+          </div>
+        )}
+
+        {/* Quarterly Results Section - FULL WIDTH */}
+        <div className="quarterly-breakout">
+          <section className={`quarterly-section ${quarterlyLoading ? 'loading-glow-border' : ''}`}>
+            {/* Only show title when NOT loading */}
+            {!quarterlyLoading && (
+              <h3 className="quarterly-title">Quarterly Results</h3>
+            )}
+
+            {/* Rest of your quarterly section code... */}
+          </section>
+        </div>
+
+
+        {/* Show error if quarterly data failed to load */}
+        {quarterlyError && !quarterlyLoading && (
+          <div className="ratios-error">
+            <strong>Error:</strong> {quarterlyError}
+            <button 
+              onClick={() => fetchQuarterlyResults(holding.ticker || holding.symbol)}
+              className="retry-button"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+        {/* Show quarterly data when loaded successfully */}
+        {!quarterlyLoading && quarterlyData && !quarterlyError && (
+          <div className="quarterly-table-container">
+            <table className="quarterly-table">
+              <thead>
+                <tr>
+                  <th className="metric-header">Metric</th>
+                  {quarterlyData.headers.map((header, index) => (
+                    <th key={index} className={index % 4 === 0 ? 'highlight-quarter' : ''}>
+                      {header}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(quarterlyData.metrics).map(([metric, values]) => (
+                  <tr key={metric} className={
+                    metric.includes('Profit') || metric.includes('Sales') || metric.includes('EPS') 
+                      ? 'important-metric' : ''
+                  }>
+                    <td className="metric-name">{metric}</td>
+                    {values.map((value, index) => (
+                      <td key={index} className={index % 4 === 0 ? 'highlight-quarter' : ''}>
+                        {value}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

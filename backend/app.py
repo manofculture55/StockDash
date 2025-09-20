@@ -5,6 +5,8 @@ A Flask-based backend for managing stock portfolios with real-time data scraping
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from flask_caching import Cache
+from scraper import scrape_screener_ratios, scrape_quarterly_results
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -22,6 +24,10 @@ from scraper import scrape_screener_ratios
 
 app = Flask(__name__)
 CORS(app)
+
+# Configure simple cache
+app.config['CACHE_TYPE'] = 'simple'  # In-memory cache
+cache = Cache(app)
 
 # File paths
 HOLDINGS_FILE = 'holdings.json'
@@ -448,6 +454,35 @@ def get_stock_ratios(ticker):
         print(f"Error fetching ratios for {ticker}: {e}")
         print(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
+    
+@app.route('/api/quarterly-results/<ticker>')
+def get_quarterly_results(ticker):
+    """Get quarterly financial results for a stock"""
+    try:
+        print(f"📊 [API] Fetching quarterly results for {ticker}")
+        
+        # Check cache first
+        cache_key = f"quarterly_{ticker.upper()}"
+        cached_data = cache.get(cache_key)
+        
+        if cached_data:
+            print(f"💾 [API] Returning cached quarterly data for {ticker}")
+            return jsonify({'quarterly_data': cached_data})
+        
+        # Scrape fresh data
+        quarterly_data = scrape_quarterly_results(ticker.upper())
+        
+        if quarterly_data:
+            # Cache for 1 hour
+            cache.set(cache_key, quarterly_data, timeout=3600)
+            return jsonify({'quarterly_data': quarterly_data})
+        else:
+            return jsonify({'error': 'No quarterly data found'}), 404
+            
+    except Exception as e:
+        print(f"❌ [API] Error in quarterly results endpoint: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
+
 
 @app.route('/api/holdings', methods=['GET'])
 def get_holdings():
