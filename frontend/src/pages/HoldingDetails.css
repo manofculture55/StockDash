@@ -1,0 +1,642 @@
+/**
+ * HoldingDetails Component Styles
+ * Detailed stock information with portfolio metrics, financial ratios, and quarterly results
+ */
+
+.details-container {
+  padding: 20px;
+  min-height: 100vh;
+  color: var(--text-primary);
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: var(--bg-primary);
+  transition: all 0.3s ease;
+}
+
+.details-loading {
+  text-align: center;
+  color: var(--text-primary);
+  font-size: 18px;
+  margin-top: 50px;
+  transition: color 0.3s ease;
+}
+
+.details-error {
+  text-align: center;
+  color: var(--error-color);
+  font-size: 18px;
+  margin-top: 50px;
+}
+
+.back-button {
+  background: var(--border-primary);
+  color: var(--text-primary);
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  background: var(--border-secondary);
+  transform: translateX(-2px);
+}
+
+/* Header Section */
+.details-header {
+  margin-bottom: 30px;
+}
+
+.details-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+  color: var(--text-primary);
+  transition: color 0.3s ease;
+}
+
+.details-symbol {
+  color: var(--text-secondary);
+  font-size: 16px;
+  font-weight: normal;
+  transition: color 0.3s ease;
+}
+
+.exchange-info {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-top: 8px;
+  transition: color 0.3s ease;
+}
+
+.exchange-info strong {
+  color: var(--text-primary);
+  transition: color 0.3s ease;
+}
+
+/* Portfolio Summary */
+.portfolio-summary {
+  margin-bottom: 30px;
+}
+
+.details-table {
+  width: 100%;
+  background: var(--card-bg);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  border-collapse: collapse;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.details-table .section-header {
+  background: rgba(91, 66, 243, 0.2);
+  color: var(--brand-primary);
+  font-weight: bold;
+  text-align: center;
+  padding: 16px;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--border-primary);
+  transition: border-color 0.3s ease;
+}
+
+.details-table tr {
+  border-bottom: 1px solid var(--border-primary);
+  transition: border-color 0.3s ease;
+}
+
+.details-table tr:last-child {
+  border-bottom: none;
+}
+
+.details-label {
+  padding: 12px 16px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  width: 40%;
+  background: var(--hover-bg);
+  transition: all 0.3s ease;
+}
+
+.details-value {
+  padding: 12px 16px;
+  color: var(--text-primary);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.details-value.positive {
+  color: var(--success-color);
+}
+
+.details-value.negative {
+  color: var(--error-color);
+}
+
+/* Ratios Section */
+.ratios-section {
+  margin: 40px 0;
+}
+
+.ratios-title {
+  color: var(--text-primary);
+  font-size: 24px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--border-primary);
+  padding-bottom: 12px;
+  transition: all 0.3s ease;
+}
+
+.loading-indicator {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-style: italic;
+  transition: color 0.3s ease;
+}
+
+.ratios-error {
+  background: rgba(255, 94, 94, 0.1);
+  border: 1px solid var(--error-color);
+  color: var(--error-color);
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ratios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.ratio-category {
+  background: var(--card-bg);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.category-title {
+  color: var(--brand-primary);
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--brand-primary);
+  padding-bottom: 8px;
+}
+
+.ratios-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ratio-row {
+  border-bottom: 1px solid var(--hover-bg);
+  transition: border-color 0.3s ease;
+}
+
+.ratio-row:last-child {
+  border-bottom: none;
+}
+
+.ratio-label {
+  padding: 10px 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  width: 60%;
+  transition: color 0.3s ease;
+}
+
+.ratio-value {
+  padding: 10px 0;
+  color: var(--text-primary);
+  font-weight: 600;
+  text-align: right;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+/* Purchase History */
+.purchase-history-section {
+  margin-top: 30px;
+}
+
+.purchase-history-container {
+  padding: 0;
+}
+
+.purchase-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--card-bg);
+  margin: 0;
+  transition: background-color 0.3s ease;
+}
+
+.purchase-history-table thead {
+  background: var(--table-header-bg);
+  transition: background-color 0.3s ease;
+}
+
+.purchase-history-table th {
+  padding: 12px;
+  text-align: left;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border-primary);
+  transition: all 0.3s ease;
+}
+
+.purchase-history-table td {
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font-size: 14px;
+  border-bottom: 1px solid var(--hover-bg);
+  transition: all 0.3s ease;
+}
+
+.purchase-history-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Custom Loader Styles */
+.loader {
+  color: var(--text-primary);
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-size: 25px;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 40px;
+  padding: 10px 10px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  gap: 10px;
+}
+
+.loader p {
+  margin: 0;
+  line-height: 40px;
+}
+
+.words {
+  overflow: hidden;
+  position: relative;
+  height: 40px;
+  width: auto;
+  min-width: 120px;
+}
+
+.words::after {
+   display: none;
+}
+
+.word {
+  display: block;
+  height: 40px;
+  padding-left: 6px;
+  color: var(--brand-primary);
+  animation: spin_4991 4s infinite;
+  line-height: 40px;
+  white-space: nowrap;
+}
+
+@keyframes spin_4991 {
+  10% {
+    -webkit-transform: translateY(-102%);
+    transform: translateY(-102%);
+  }
+  25% {
+    -webkit-transform: translateY(-100%);
+    transform: translateY(-100%);
+  }
+  35% {
+    -webkit-transform: translateY(-202%);
+    transform: translateY(-202%);
+  }
+  50% {
+    -webkit-transform: translateY(-200%);
+    transform: translateY(-200%);
+  }
+  60% {
+    -webkit-transform: translateY(-302%);
+    transform: translateY(-302%);
+  }
+  75% {
+    -webkit-transform: translateY(-300%);
+    transform: translateY(-300%);
+  }
+  85% {
+    -webkit-transform: translateY(-402%);
+    transform: translateY(-402%);
+  }
+  100% {
+    -webkit-transform: translateY(-400%);
+    transform: translateY(-400%);
+  }
+}
+
+.loading-glow-border {
+  position: relative;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: linear-gradient(var(--card-bg), var(--card-bg)) padding-box;
+  animation: bottom-glow-rotate 2s linear infinite;
+  padding: 20px;
+  text-align: center;
+  margin: 20px 0;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+}
+
+@keyframes bottom-glow-rotate {
+  0% {
+    box-shadow:
+      inset 0 -10px 20px 0 #fff,
+      inset 0 -20px 30px 0 #ad5fff,
+      inset 0 -60px 60px 0 #471eec;
+  }
+  50% {
+    box-shadow:
+      inset 0 -10px 20px 0 #fff,
+      inset 0 -20px 10px 0 #d60a47,
+      inset 0 -40px 60px 0 #311e80;
+  }
+  100% {
+    box-shadow:
+      inset 0 -10px 20px 0 #fff,
+      inset 0 -20px 30px 0 #ad5fff,
+      inset 0 -60px 60px 0 #471eec;
+  }
+}
+
+/* Quarterly Results Section */
+.quarterly-section {
+  margin: 40px 0;
+  width: 100%;
+  padding: 0;
+}
+
+.quarterly-title {
+  color: var(--text-primary);
+  font-size: 24px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--border-primary);
+  padding-bottom: 12px;
+  transition: all 0.3s ease;
+}
+
+.quarterly-loading {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 20px;
+  font-style: italic;
+  transition: color 0.3s ease;
+}
+
+.quarterly-table-container {
+  background: var(--card-bg);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px var(--box-shadow);
+  
+  /* Fit within parent container */
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  
+  /* Only the table container should have horizontal scroll */
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.quarterly-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1200px; /* Force minimum width for all columns - this will trigger horizontal scroll when needed */
+}
+
+.quarterly-table thead {
+  background: var(--table-header-bg);
+  transition: background-color 0.3s ease;
+}
+
+.quarterly-table th {
+  background: var(--table-header-bg);
+  color: var(--text-secondary);
+  padding: 12px 8px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border-primary);
+  transition: all 0.3s ease;
+  min-width: 80px; /* Ensure minimum column width */
+}
+
+.quarterly-table th.metric-header {
+  text-align: left;
+  font-weight: 600;
+  background: var(--table-header-bg);
+  min-width: 150px; /* Wider for metric names */
+  position: sticky; /* Keep metric names visible while scrolling */
+  left: 0;
+  z-index: 10;
+  border-right: 2px solid var(--border-primary);
+}
+
+.quarterly-table th.highlight-quarter {
+  background: rgba(91, 66, 243, 0.2);
+  color: var(--brand-primary);
+  font-weight: 700;
+}
+
+.quarterly-table td {
+  padding: 10px 6px; /* Slightly less padding for more columns */
+  text-align: center;
+  font-size: 13px; /* Slightly smaller font */
+  border-bottom: 1px solid var(--hover-bg);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  min-width: 70px; /* Ensure minimum column width */
+}
+
+.quarterly-table td.metric-name {
+  text-align: left;
+  font-weight: 600;
+  background: var(--table-header-bg);
+  min-width: 150px; /* Wider for metric names */
+  position: sticky; /* Keep metric names visible while scrolling */
+  left: 0;
+  z-index: 10;
+  border-right: 2px solid var(--border-primary);
+  color: var(--text-primary);
+}
+
+.quarterly-table td.highlight-quarter {
+  background: rgba(91, 66, 243, 0.1);
+  font-weight: 600;
+}
+
+.quarterly-table tr.important-metric {
+  font-weight: 600;
+}
+
+.quarterly-table tr.important-metric td {
+  background: var(--hover-bg);
+  font-weight: 700;
+}
+
+.quarterly-table tr.important-metric td.metric-name {
+  background: rgba(91, 66, 243, 0.1);
+  color: var(--brand-primary);
+}
+
+/* Hover effects */
+.quarterly-table tbody tr:hover {
+  background: var(--table-row-hover);
+}
+
+.quarterly-table tbody tr:hover td.metric-name {
+  background: rgba(91, 66, 243, 0.15);
+}
+
+/* Loading state for quarterly section */
+.quarterly-section.loading-glow-border {
+  --bg-color: var(--bg-primary);
+  background: linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+              linear-gradient(45deg, #fff, #8d5cff, #471eec, #d60a47) border-box;
+  animation: bottom-glow-rotate 2s linear infinite;
+  padding: 20px;
+  text-align: center;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 2px solid transparent;
+}
+
+/* Enhanced scrollbar styling for better UX */
+.quarterly-table-container::-webkit-scrollbar {
+  height: 12px; /* Make scrollbar slightly thicker for better visibility */
+}
+
+.quarterly-table-container::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  margin: 0 8px; /* Add margins to scrollbar track */
+}
+
+.quarterly-table-container::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 6px;
+  border: 2px solid var(--bg-secondary); /* Add border for better contrast */
+}
+
+.quarterly-table-container::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+.quarterly-table-container::-webkit-scrollbar-corner {
+  background: var(--bg-secondary);
+}
+
+/* Firefox scrollbar styling */
+.quarterly-table-container {
+  scrollbar-width: auto; /* Make scrollbar normal size in Firefox */
+  scrollbar-color: var(--border-primary) var(--bg-secondary);
+}
+
+/* Responsive Design for HoldingDetails */
+@media (max-width: 768px) {
+  .ratios-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .details-container {
+    padding: 15px;
+  }
+  
+  .details-title {
+    font-size: 24px;
+  }
+  
+  /* Quarterly responsive */
+  .quarterly-table th,
+  .quarterly-table td {
+    padding: 8px 4px;
+    font-size: 11px;
+    min-width: 60px;
+  }
+  
+  .quarterly-table th.metric-header,
+  .quarterly-table td.metric-name {
+    min-width: 120px;
+  }
+  
+  .quarterly-table {
+    min-width: 800px;
+  }
+  
+  .quarterly-table-container::-webkit-scrollbar {
+    height: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Quarterly responsive */
+  .quarterly-section {
+    margin: 30px 0;
+  }
+  
+  .quarterly-title {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .quarterly-table th,
+  .quarterly-table td {
+    padding: 6px 3px;
+    font-size: 10px;
+    min-width: 50px;
+  }
+  
+  .quarterly-table th.metric-header,
+  .quarterly-table td.metric-name {
+    min-width: 100px;
+  }
+  
+  .quarterly-table {
+    min-width: 600px;
+  }
+  
+  .quarterly-table-container::-webkit-scrollbar {
+    height: 6px;
+  }
+}
+
+/* Additional responsive rules for quarterly table */
+@media (max-width: 1200px) {
+  .quarterly-table {
+    min-width: 1000px;
+  }
+}

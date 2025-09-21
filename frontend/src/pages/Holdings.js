@@ -6,7 +6,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../App.css';
+import './Holdings.css';
 
 // Configuration
 const API_BASE_URL = 'http://localhost:5000/api';
