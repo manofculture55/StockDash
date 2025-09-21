@@ -206,12 +206,19 @@
 .holdings-table th {
   background: var(--table-header-bg);
   padding: 16px;
-  text-align: left;
+  text-align: left;  /* This will be overridden by specific rules below */
   font-weight: 600;
   color: var(--text-secondary);
   border-bottom: 1px solid var(--border-primary);
   transition: all 0.3s ease;
 }
+
+/* ADD THIS BLOCK HERE - Fix header alignment */
+.holdings-table th:nth-child(2) { text-align: right; }   /* Market Price */
+.holdings-table th:nth-child(3) { text-align: right; }   /* Returns */
+.holdings-table th:nth-child(4) { text-align: right; }   /* Current Value */
+.holdings-table th:nth-child(5) { text-align: center; }  /* Actions */
+
 
 .holding-row {
   cursor: pointer;
@@ -437,6 +444,12 @@
   text-align: center;
   margin: 20px 0;
 }
+
+.error-message {
+  color: var(--error-color);
+  font-size: 16px;
+}
+
 
 .retry-button {
   background: var(--brand-primary);

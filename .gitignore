@@ -1,6 +1,105 @@
-# Python cache files 
-__pycache__/ 
-*.py[cod] 
-*$py.class 
-# Debug files 
-debug_*.html 
+# Dependencies
+node_modules/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Production build
+build/
+dist/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Database files (user-specific portfolio data)
+*.db
+*.sqlite
+*.sqlite3
+portfolio.db
+backend/portfolio.db
+
+# Old JSON data files (if they still exist)
+holdings.json
+stock_cache.json
+backend/holdings.json
+backend/stock_cache.json
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Debug files
+debug_*.html
+
+# Python compiled bytecode
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Desktop.ini
+$RECYCLE.BIN/
+
+# Selenium/scraper files
+geckodriver.log
+chromedriver.log
+selenium-debug.log
+msedgedriver.exe.log
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# pytest
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json

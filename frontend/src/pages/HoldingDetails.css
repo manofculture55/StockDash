@@ -171,6 +171,22 @@
   align-items: center;
 }
 
+.retry-button {
+  background: var(--error-color);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+.retry-button:hover {
+  background: #FF3333;  /* ✅ WORKS */
+  transform: translateY(-1px);
+}
+
 .ratios-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -271,7 +287,7 @@
   border-bottom: none;
 }
 
-/* Custom Loader Styles */
+/* Custom Loader Styles - Only for Ratios */
 .loader {
   color: var(--text-primary);
   font-family: "Roboto", sans-serif;
@@ -404,7 +420,7 @@
   transition: all 0.3s ease;
 }
 
-.quarterly-loading {
+.quarterly-placeholder {
   text-align: center;
   color: var(--text-secondary);
   padding: 20px;
@@ -508,31 +524,6 @@
 .quarterly-table tr.important-metric td.metric-name {
   background: rgba(91, 66, 243, 0.1);
   color: var(--brand-primary);
-}
-
-/* Hover effects */
-.quarterly-table tbody tr:hover {
-  background: var(--table-row-hover);
-}
-
-.quarterly-table tbody tr:hover td.metric-name {
-  background: rgba(91, 66, 243, 0.15);
-}
-
-/* Loading state for quarterly section */
-.quarterly-section.loading-glow-border {
-  --bg-color: var(--bg-primary);
-  background: linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
-              linear-gradient(45deg, #fff, #8d5cff, #471eec, #d60a47) border-box;
-  animation: bottom-glow-rotate 2s linear infinite;
-  padding: 20px;
-  text-align: center;
-  min-height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  border: 2px solid transparent;
 }
 
 /* Enhanced scrollbar styling for better UX */

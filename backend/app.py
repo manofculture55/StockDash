@@ -1,11 +1,10 @@
 """
 Stock Portfolio Management API
-A Flask-based backend for managing stock portfolios with real-time data scraping
+A Flask-based backend for managing stock portfolios with SQLite database
 """
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from flask_caching import Cache
 from scraper import scrape_screener_ratios, scrape_quarterly_results
 import requests
 from bs4 import BeautifulSoup
@@ -14,9 +13,17 @@ import os
 import re
 import time
 import traceback
+from datetime import datetime
 
-# Import our custom scraper module
-from scraper import scrape_screener_ratios
+# Import database functions
+from database import (
+    init_database, get_or_create_company, create_holding, add_purchase,
+    get_all_holdings, get_holding_by_id, update_holding_prices, 
+    sell_holding_shares, save_ratios_cache, get_ratios_cache,
+    save_quarterly_cache, get_quarterly_cache, get_companies_for_suggestions,
+    find_company_by_ticker, update_holding_avg_price_and_quantity,
+    find_existing_holding_by_ticker
+)
 
 # ============================================================================
 # APPLICATION CONFIGURATION
@@ -25,39 +32,9 @@ from scraper import scrape_screener_ratios
 app = Flask(__name__)
 CORS(app)
 
-# Configure simple cache
-app.config['CACHE_TYPE'] = 'simple'  # In-memory cache
-cache = Cache(app)
-
-# File paths
-HOLDINGS_FILE = 'holdings.json'
-STOCK_CACHE_FILE = 'stock_cache.json'
-
-# ============================================================================
-# CACHE MANAGEMENT FUNCTIONS (STOCK CACHE ONLY)
-# ============================================================================
-
-def load_stock_cache():
-    """Load existing stock cache from JSON file"""
-    if os.path.exists(STOCK_CACHE_FILE):
-        try:
-            with open(STOCK_CACHE_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except Exception:
-            return {}
-    return {}
-
-def save_stock_cache(cache):
-    """Save stock cache to JSON file"""
-    try:
-        with open(STOCK_CACHE_FILE, 'w', encoding='utf-8') as f:
-            json.dump(cache, f, indent=4)
-    except Exception as e:
-        print(f"Error saving stock cache: {e}")
-
-# Initialize stock cache
-stock_cache = load_stock_cache()
-print(f"📂 Loaded {len(stock_cache)} cached companies")
+# Initialize database on startup
+init_database()
+print("🗄️ SQLite database initialized")
 
 # ============================================================================
 # UTILITY FUNCTIONS
@@ -73,62 +50,80 @@ def parse_price(value):
     cleaned = re.sub(r'[^\d.]', '', str(value))
     return float(cleaned) if cleaned else 0.0
 
-def find_company_by_ticker(ticker):
-    """Find company data by ticker from cache"""
-    for company_name, data in stock_cache.items():
-        if ticker in data.get('tickers', []):
-            return company_name, data
-    return None, None
+
+def get_today_date():
+    """Get today's date in YYYY-MM-DD format"""
+    return datetime.now().strftime('%Y-%m-%d')
+
+
+def is_data_fresh(data_entry):
+    """Check if cached data is from today"""
+    if not data_entry or 'date' not in data_entry:
+        return False
+    return data_entry['date'] == get_today_date()
+
 
 # ============================================================================
-# DATA PERSISTENCE FUNCTIONS
+# DATABASE-BASED CACHING FUNCTIONS
 # ============================================================================
 
-def read_holdings():
-    """Load holdings data from file"""
-    if os.path.exists(HOLDINGS_FILE):
-        try:
-            with open(HOLDINGS_FILE, 'r', encoding='utf-8') as file:
-                return json.load(file)
-        except Exception:
-            pass
-    return {"holdings": []}
-
-def write_holdings(data):
-    """Save holdings data to file"""
-    try:
-        with open(HOLDINGS_FILE, 'w', encoding='utf-8') as file:
-            json.dump(data, file, indent=2)
-    except Exception as e:
-        print(f"Error saving holdings: {e}")
-
-def migrate_transactions_to_purchases(data):
-    """Migrate legacy transaction format to purchases format"""
-    changed = False
-    for holding in data.get("holdings", []):
-        if "transactions" in holding and "purchases" not in holding:
-            purchases = []
-            for transaction in holding.get("transactions", []):
-                qty = transaction.get("quantity", transaction.get("qty", 0))
-                try:
-                    qty = int(float(qty))
-                except Exception:
-                    qty = 0
-                
-                price_num = parse_price(transaction.get("price", 0))
-                purchases.append({
-                    "date": transaction.get("date"),
-                    "quantity": qty,
-                    "price": round(price_num, 2)
-                })
-            
-            holding["purchases"] = purchases
-            holding.pop("transactions", None)
-            changed = True
+def get_cached_ratios_by_ticker(ticker):
+    """Get cached ratios for a ticker if from today"""
+    # Find holding by ticker first
+    existing_holding = find_existing_holding_by_ticker(ticker)
+    if not existing_holding:
+        return None
     
-    if changed:
-        write_holdings(data)
-    return data
+    # Get cached ratios for this holding
+    cached_ratios = get_ratios_cache(existing_holding['id'])
+    if cached_ratios and is_data_fresh(cached_ratios):
+        print(f"💾 [CACHE] Using cached ratios for {ticker} from {cached_ratios['date']}")
+        return cached_ratios['data']
+    
+    return None
+
+
+def save_ratios_to_cache_by_ticker(ticker, ratios_data):
+    """Save ratios data to database with today's date"""
+    existing_holding = find_existing_holding_by_ticker(ticker)
+    if not existing_holding:
+        print(f"⚠️  [CACHE] No holding found for {ticker} to save ratios")
+        return
+    
+    today = get_today_date()
+    updated_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
+    save_ratios_cache(existing_holding['id'], ratios_data, today, updated_time)
+    print(f"💾 [CACHE] Saved ratios for {ticker} with date {today}")
+
+
+def get_cached_quarterly_by_ticker(ticker):
+    """Get cached quarterly data for a ticker if from today"""
+    existing_holding = find_existing_holding_by_ticker(ticker)
+    if not existing_holding:
+        return None
+    
+    cached_quarterly = get_quarterly_cache(existing_holding['id'])
+    if cached_quarterly and is_data_fresh(cached_quarterly):
+        print(f"💾 [CACHE] Using cached quarterly data for {ticker} from {cached_quarterly['date']}")
+        return cached_quarterly['data']
+    
+    return None
+
+
+def save_quarterly_to_cache_by_ticker(ticker, quarterly_data):
+    """Save quarterly data to database with today's date"""
+    existing_holding = find_existing_holding_by_ticker(ticker)
+    if not existing_holding:
+        print(f"⚠️  [CACHE] No holding found for {ticker} to save quarterly data")
+        return
+    
+    today = get_today_date()
+    updated_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
+    save_quarterly_cache(existing_holding['id'], quarterly_data, today, updated_time)
+    print(f"💾 [CACHE] Saved quarterly data for {ticker} with date {today}")
+
 
 # ============================================================================
 # EXTERNAL DATA PROVIDERS
@@ -159,6 +154,7 @@ def get_company_name_from_screener(ticker):
     except Exception as e:
         print(f"Error fetching from screener: {e}")
         return None, url
+
 
 def get_kotak_price_from_url(kotak_url):
     """Get current price, previous close, and price change from Kotak URL"""
@@ -222,6 +218,7 @@ def get_kotak_price_from_url(kotak_url):
     except Exception as e:
         print(f"Error fetching Kotak data: {e}")
         return None
+
 
 def find_working_kotak_url(company_name):
     """Try multiple variations of company name to find the correct Kotak URL"""
@@ -296,18 +293,6 @@ def find_working_kotak_url(company_name):
     print(f"❌ All Kotak URL attempts failed for {company_name}")
     return None, None
 
-def update_cache_with_new_ticker(company_name, ticker, screener_url, kotak_url):
-    """Add new ticker to existing company or create new company entry"""
-    if company_name in stock_cache:
-        if ticker not in stock_cache[company_name]['tickers']:
-            stock_cache[company_name]['tickers'].append(ticker)
-            stock_cache[company_name]['screener_urls'][ticker] = screener_url
-    else:
-        stock_cache[company_name] = {
-            'tickers': [ticker],
-            'screener_urls': {ticker: screener_url},
-            'kotak_url': kotak_url
-        }
 
 # ============================================================================
 # API ROUTES
@@ -316,43 +301,29 @@ def update_cache_with_new_ticker(company_name, ticker, screener_url, kotak_url):
 @app.route('/api/test')
 def test_route():
     """Health check endpoint"""
+    # Get company count from database
+    companies = get_companies_for_suggestions('')
     return jsonify({
-        "message": "Flask is working!",
+        "message": "Flask is working with SQLite!",
         "timestamp": time.time(),
-        "cache_stats": {
-            "companies": len(stock_cache)
+        "database_stats": {
+            "companies": len(companies),
+            "database": "SQLite portfolio.db"
         }
     })
 
+
 @app.route('/api/suggestions', methods=['GET'])
 def get_suggestions():
-    """Get stock search suggestions"""
+    """Get stock search suggestions from database"""
     query = request.args.get('q', '').strip().lower()
     
     if not query or len(query) < 1:
         return jsonify({'suggestions': []})
     
-    suggestions = []
-    
-    for company_name, data in stock_cache.items():
-        if (query in company_name.lower() or 
-            any(query in ticker.lower() for ticker in data['tickers'])):
-            
-            primary_ticker = min(data['tickers'], key=len)
-            display_ticker = primary_ticker
-            
-            if len(data['tickers']) > 1:
-                other_tickers = [t for t in data['tickers'] if t != primary_ticker]
-                display_ticker += f" ({', '.join(other_tickers)})"
-            
-            suggestions.append({
-                'ticker': primary_ticker,
-                'company_name': company_name,
-                'display_ticker': display_ticker,
-                'all_tickers': data['tickers']
-            })
-    
+    suggestions = get_companies_for_suggestions(query)
     return jsonify({'suggestions': suggestions[:10]})
+
 
 @app.route('/api/stock-price')
 def get_stock_price():
@@ -366,14 +337,15 @@ def get_stock_price():
     ticker = company.upper().replace(" ", "")
 
     try:
-        company_name, cached_data = find_company_by_ticker(ticker)
+        # Try to find company in database
+        company_data = find_company_by_ticker(ticker)
         response_data = {}
         
-        if company_name and cached_data:
-            kotak_data = get_kotak_price_from_url(stock_cache[company_name]['kotak_url'])
+        if company_data:
+            kotak_data = get_kotak_price_from_url(company_data['kotak_url'])
             if kotak_data and kotak_data['price']:
                 response_data = {
-                    "name": company_name,
+                    "name": company_data['name'],
                     "price": kotak_data['price'],
                     "previous_close": kotak_data['previous_close'] or "0",
                     "price_change_amount": kotak_data['price_change_amount'] or "0",
@@ -386,10 +358,20 @@ def get_stock_price():
             if not company_name:
                 return jsonify({"error": "Company not found"}), 404
 
-            if company_name in stock_cache:
-                update_cache_with_new_ticker(company_name, ticker, screener_url, stock_cache[company_name]['kotak_url'])
-                save_stock_cache(stock_cache)
-                kotak_data = get_kotak_price_from_url(stock_cache[company_name]['kotak_url'])
+            # Check if company exists but with different ticker
+            existing_company = find_company_by_ticker(company_name.replace(' ', '').upper())
+            
+            if existing_company:
+                # Update existing company with new ticker
+                tickers = existing_company['tickers'] + [ticker]
+                screener_urls = existing_company['screener_urls']
+                screener_urls[ticker] = screener_url
+                
+                company_id = get_or_create_company(
+                    company_name, tickers, screener_urls, existing_company['kotak_url']
+                )
+                
+                kotak_data = get_kotak_price_from_url(existing_company['kotak_url'])
                 if kotak_data and kotak_data['price']:
                     response_data = {
                         "name": company_name,
@@ -399,12 +381,14 @@ def get_stock_price():
                         "price_change_percent": kotak_data['price_change_percent'] or "0%"
                     }
             else:
+                # Create completely new company
                 kotak_price, kotak_url = find_working_kotak_url(company_name)
                 if not kotak_price or not kotak_url:
                     return jsonify({"error": "Price not found"}), 404
                 
-                update_cache_with_new_ticker(company_name, ticker, screener_url, kotak_url)
-                save_stock_cache(stock_cache)
+                company_id = get_or_create_company(
+                    company_name, [ticker], {ticker: screener_url}, kotak_url
+                )
                 
                 response_data = {
                     "name": company_name,
@@ -412,17 +396,27 @@ def get_stock_price():
                     "previous_close": "0"
                 }
 
-        # Add fresh ratios if requested
+        # Add detailed ratios if requested (with database caching)
         if detailed and response_data:
-            print(f"📊 Fresh ratios requested for {ticker}")
-            ratios = scrape_screener_ratios(ticker)  # Called from scraper.py
+            print(f"📊 Detailed ratios requested for {ticker}")
             
-            if ratios:
-                response_data['ratios'] = ratios
-                response_data['ratios_count'] = len(ratios)
+            # Try to get cached ratios first
+            cached_ratios = get_cached_ratios_by_ticker(ticker)
+            if cached_ratios:
+                response_data['ratios'] = cached_ratios
+                response_data['ratios_count'] = len(cached_ratios)
+                response_data['ratios_cached'] = True
             else:
-                response_data['ratios'] = {}
-                response_data['ratios_count'] = 0
+                # Scrape fresh ratios
+                fresh_ratios = scrape_screener_ratios(ticker)
+                if fresh_ratios:
+                    save_ratios_to_cache_by_ticker(ticker, fresh_ratios)
+                    response_data['ratios'] = fresh_ratios
+                    response_data['ratios_count'] = len(fresh_ratios)
+                    response_data['ratios_cached'] = False
+                else:
+                    response_data['ratios'] = {}
+                    response_data['ratios_count'] = 0
 
         return jsonify(response_data)
 
@@ -430,22 +424,37 @@ def get_stock_price():
         print(f"Error in get_stock_price: {e}")
         return jsonify({"error": str(e)}), 500
 
+
 @app.route('/api/stock-ratios/<ticker>')
 def get_stock_ratios(ticker):
-    """Get fresh detailed financial ratios for a stock"""
+    """Get financial ratios - cached if same day, fresh if different day"""
     ticker = ticker.upper()
-    print(f"🎯 Fresh ratios requested for {ticker}")
+    print(f"🎯 Ratios requested for {ticker}")
     
     try:
-        # Always scrape fresh ratios using our separate scraper module
-        ratios = scrape_screener_ratios(ticker)  # Called from scraper.py
-        
-        if ratios:
+        # Try to get cached ratios first
+        cached_ratios = get_cached_ratios_by_ticker(ticker)
+        if cached_ratios:
             return jsonify({
                 'ticker': ticker,
-                'ratios': ratios,
-                'count': len(ratios),
-                'cached': False  # Always fresh
+                'ratios': cached_ratios,
+                'count': len(cached_ratios),
+                'cached': True,
+                'source': 'database_cache'
+            })
+        
+        # Scrape fresh ratios
+        print(f"🔄 [SCRAPER] Scraping fresh ratios for {ticker}")
+        fresh_ratios = scrape_screener_ratios(ticker)
+        
+        if fresh_ratios:
+            save_ratios_to_cache_by_ticker(ticker, fresh_ratios)
+            return jsonify({
+                'ticker': ticker,
+                'ratios': fresh_ratios,
+                'count': len(fresh_ratios),
+                'cached': False,
+                'source': 'fresh_scrape'
             })
         else:
             return jsonify({"error": "Could not fetch ratios"}), 404
@@ -454,28 +463,35 @@ def get_stock_ratios(ticker):
         print(f"Error fetching ratios for {ticker}: {e}")
         print(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
-    
+
+
 @app.route('/api/quarterly-results/<ticker>')
 def get_quarterly_results(ticker):
-    """Get quarterly financial results for a stock"""
+    """Get quarterly results - cached if same day, fresh if different day"""
+    ticker = ticker.upper()
+    print(f"📊 Quarterly results requested for {ticker}")
+    
     try:
-        print(f"📊 [API] Fetching quarterly results for {ticker}")
+        # Try to get cached quarterly data first
+        cached_quarterly = get_cached_quarterly_by_ticker(ticker)
+        if cached_quarterly:
+            return jsonify({
+                'quarterly_data': cached_quarterly,
+                'cached': True,
+                'source': 'database_cache'
+            })
         
-        # Check cache first
-        cache_key = f"quarterly_{ticker.upper()}"
-        cached_data = cache.get(cache_key)
+        # Scrape fresh quarterly data
+        print(f"🔄 [SCRAPER] Scraping fresh quarterly data for {ticker}")
+        fresh_quarterly = scrape_quarterly_results(ticker)
         
-        if cached_data:
-            print(f"💾 [API] Returning cached quarterly data for {ticker}")
-            return jsonify({'quarterly_data': cached_data})
-        
-        # Scrape fresh data
-        quarterly_data = scrape_quarterly_results(ticker.upper())
-        
-        if quarterly_data:
-            # Cache for 1 hour
-            cache.set(cache_key, quarterly_data, timeout=3600)
-            return jsonify({'quarterly_data': quarterly_data})
+        if fresh_quarterly:
+            save_quarterly_to_cache_by_ticker(ticker, fresh_quarterly)
+            return jsonify({
+                'quarterly_data': fresh_quarterly,
+                'cached': False,
+                'source': 'fresh_scrape'
+            })
         else:
             return jsonify({'error': 'No quarterly data found'}), 404
             
@@ -488,33 +504,38 @@ def get_quarterly_results(ticker):
 def get_holdings():
     """Get all holdings with updated market prices"""
     try:
-        data = read_holdings()
-        data = migrate_transactions_to_purchases(data)
+        holdings = get_all_holdings()
         
         # Update market data for all holdings
-        for holding in data.get('holdings', []):
-            ticker = holding.get('ticker') or holding.get('symbol', '')
-            if ticker:
-                company_name, cached_data = find_company_by_ticker(ticker.upper())
-                if company_name and cached_data:
-                    kotak_data = get_kotak_price_from_url(cached_data['kotak_url'])
-                    if kotak_data:
-                        if kotak_data['price']:
-                            holding['marketPrice'] = f"₹{kotak_data['price']}"
-                        if kotak_data['previous_close']:
-                            holding['previousClose'] = kotak_data['previous_close']
-                        if kotak_data['price_change_amount']:
-                            holding['priceChangeAmount'] = kotak_data['price_change_amount']
-                        if kotak_data['price_change_percent']:
-                            holding['priceChangePercent'] = kotak_data['price_change_percent']
-                        if not holding.get('name'):
-                            holding['name'] = company_name
+        for holding in holdings:
+            # Find company data for price updates
+            company_data = find_company_by_ticker(holding['ticker'])
+            if company_data:
+                kotak_data = get_kotak_price_from_url(company_data['kotak_url'])
+                if kotak_data:
+                    price_updates = {}
+                    if kotak_data['price']:
+                        price_updates['marketPrice'] = f"₹{kotak_data['price']}"
+                        holding['marketPrice'] = f"₹{kotak_data['price']}"
+                    if kotak_data['previous_close']:
+                        price_updates['previousClose'] = kotak_data['previous_close']
+                        holding['previousClose'] = kotak_data['previous_close']
+                    if kotak_data['price_change_amount']:
+                        price_updates['priceChangeAmount'] = kotak_data['price_change_amount']
+                        holding['priceChangeAmount'] = kotak_data['price_change_amount']
+                    if kotak_data['price_change_percent']:
+                        price_updates['priceChangePercent'] = kotak_data['price_change_percent']
+                        holding['priceChangePercent'] = kotak_data['price_change_percent']
+                    
+                    # Update database
+                    if price_updates:
+                        update_holding_prices(holding['id'], price_updates)
         
-        write_holdings(data)
-        return jsonify(data)
+        return jsonify({"holdings": holdings})
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route('/api/holdings', methods=['POST'])
 def add_holding():
@@ -538,91 +559,67 @@ def add_holding():
         if new_price_num <= 0:
             return jsonify({"error": "Buy price must be > 0"}), 400
 
-        holding_data['id'] = os.urandom(8).hex()
-        holding_data['ticker'] = ticker
-        holding_data['date'] = date
-
-        # Load existing data
-        if not os.path.exists(HOLDINGS_FILE) or os.stat(HOLDINGS_FILE).st_size == 0:
-            data = {"holdings": []}
+        # Get company information
+        company_name = holding_data.get('name', ticker.upper())
+        exchange = holding_data.get('exchange', 'NSE')
+        
+        # Find or create company
+        company_data = find_company_by_ticker(ticker)
+        if not company_data:
+            # Create new company entry (basic data)
+            company_id = get_or_create_company(
+                company_name, [ticker.upper()], 
+                {ticker.upper(): f"https://www.screener.in/company/{ticker.upper()}/consolidated/"}, 
+                ""
+            )
         else:
-            try:
-                with open(HOLDINGS_FILE, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-            except json.JSONDecodeError:
-                data = {"holdings": []}
+            company_id = company_data['id']
 
-        # Find existing holding
-        existing_holding = None
-        for h in data.get('holdings', []):
-            h_ticker = (h.get('ticker') or h.get('symbol') or "").strip().lower()
-            if h_ticker == ticker:
-                existing_holding = h
-                break
-
+        # Check for existing holding
+        existing_holding = find_existing_holding_by_ticker(ticker)
+        
         if existing_holding:
             # Update existing holding
-            try:
-                exist_qty = int(float(existing_holding.get('quantity', 0)))
-            except Exception:
-                exist_qty = 0
-            exist_price_num = parse_price(existing_holding.get('avgPrice') or existing_holding.get('price'))
-
-            total_qty = exist_qty + new_qty
+            exist_qty = existing_holding['quantity']
+            exist_price_num = existing_holding['avgPrice']
             
-            if total_qty > 0:
-                avg_price = ((exist_price_num * exist_qty) + (new_price_num * new_qty)) / total_qty
-            else:
-                avg_price = new_price_num
-
-            existing_holding['quantity'] = total_qty
-            existing_holding['avgPrice'] = round(avg_price, 2)
-            existing_holding['price'] = f"₹{avg_price:.2f}"
-
-            # Handle purchase history
-            if 'purchases' not in existing_holding:
-                if 'transactions' in existing_holding:
-                    existing_holding['purchases'] = [
-                        {"date": t.get("date"),
-                         "quantity": int(float(t.get("qty", t.get("quantity", 0)))),
-                         "price": round(parse_price(t.get("price", 0)), 2)}
-                        for t in existing_holding.get("transactions", [])
-                    ]
-                    existing_holding.pop("transactions", None)
-                else:
-                    existing_holding['purchases'] = []
-
-            existing_holding['purchases'].append({
-                "date": date,
-                "quantity": new_qty,
-                "price": round(new_price_num, 2)
-            })
+            total_qty = exist_qty + new_qty
+            avg_price = ((exist_price_num * exist_qty) + (new_price_num * new_qty)) / total_qty
+            
+            # Update holding in database
+            update_holding_avg_price_and_quantity(existing_holding['id'], total_qty, avg_price)
+            
+            # Add purchase record
+            add_purchase(existing_holding['id'], date, new_qty, new_price_num)
             
             message = "Existing holding updated"
-            result_holding = existing_holding
+            result_holding = get_holding_by_id(existing_holding['id'])
         else:
             # Create new holding
-            holding_data['price'] = f"₹{new_price_num:.2f}"
-            holding_data['avgPrice'] = round(new_price_num, 2)
-            holding_data['quantity'] = new_qty
-            holding_data['purchases'] = [{
-                "date": date,
-                "quantity": new_qty,
-                "price": round(new_price_num, 2)
-            }]
-
-            data['holdings'].append(holding_data)
+            holding_id = create_holding({
+                'company_id': company_id,
+                'name': company_name,
+                'symbol': ticker.upper(),
+                'ticker': ticker.lower(),
+                'quantity': new_qty,
+                'avgPrice': new_price_num,
+                'price': f"₹{new_price_num:.2f}",
+                'exchange': exchange,
+                'date': date
+            })
+            
+            # Add purchase record
+            add_purchase(holding_id, date, new_qty, new_price_num)
+            
             message = "Holding added successfully"
-            result_holding = holding_data
-
-        # Save data
-        with open(HOLDINGS_FILE, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=2)
+            result_holding = get_holding_by_id(holding_id)
 
         return jsonify({"message": message, "holding": result_holding}), 201
 
     except Exception as e:
+        print(f"Error in add_holding: {e}")
         return jsonify({"error": str(e)}), 500
+
 
 @app.route('/api/holdings/<string:holding_id>', methods=['PATCH'])
 def sell_holding_quantity(holding_id):
@@ -632,36 +629,27 @@ def sell_holding_quantity(holding_id):
         if sell_quantity <= 0:
             return jsonify({"error": "Sell quantity must be positive"}), 400
 
-        data = read_holdings()
-        holding_found = False
-        updated_holdings = []
-
-        for holding in data.get('holdings', []):
-            if str(holding['id']) == holding_id:
-                holding_found = True
-                current_qty = holding.get('quantity', 0)
-
-                if sell_quantity >= current_qty:
-                    message = "Holding fully sold and removed"
-                else:
-                    holding['quantity'] = current_qty - sell_quantity
-                    message = f"Sold {sell_quantity} shares, {holding['quantity']} remaining"
-                    updated_holdings.append(holding)
-            else:
-                updated_holdings.append(holding)
-
-        if not holding_found:
+        success = sell_holding_shares(holding_id, sell_quantity)
+        
+        if not success:
             return jsonify({"error": "Holding not found"}), 404
 
-        data['holdings'] = updated_holdings
-        write_holdings(data)
+        # Check if holding still exists (partial sell) or was completely sold
+        remaining_holding = get_holding_by_id(holding_id)
+        
+        if remaining_holding:
+            message = f"Sold {sell_quantity} shares, {remaining_holding['quantity']} remaining"
+        else:
+            message = "Holding fully sold and removed"
+
         return jsonify({"message": message})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 # ============================================================================
-# DEBUG ROUTES (Remove in production)
+# DEBUG ROUTES
 # ============================================================================
 
 @app.route('/debug/routes')
@@ -674,6 +662,7 @@ def list_routes():
         line = urllib.parse.unquote(f"{rule.endpoint}: {rule.rule} [{methods}]")
         output.append(line)
     return '<br>'.join(output)
+
 
 @app.route('/debug/test-scraper')
 def test_scraper_route():
@@ -695,8 +684,13 @@ def test_scraper_route():
 # ============================================================================
 
 if __name__ == '__main__':
-    print("🚀 Starting Stock Portfolio App...")
-    print(f"📂 Stock cache: {len(stock_cache)} entries")
+    print("🚀 Starting Stock Portfolio App with SQLite...")
+    
+    # Get database stats
+    companies = get_companies_for_suggestions('')
+    holdings = get_all_holdings()
+    
+    print(f"🗄️ Database stats: {len(companies)} companies, {len(holdings)} holdings")
     
     print("\n📋 Registered Routes:")
     for rule in app.url_map.iter_rules():

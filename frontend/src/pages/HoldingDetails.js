@@ -5,7 +5,7 @@
  * ENHANCED: Progressive Loading for Better UX + Quarterly Results
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './HoldingDetails.css';
 
@@ -21,25 +21,12 @@ function HoldingDetails() {
   const [error, setError] = useState('');
   const [ratiosError, setRatiosError] = useState('');
   
-  // NEW: Quarterly results state
+  // NEW: Quarterly results state (removed quarterlyLoading - no separate loader)
   const [quarterlyData, setQuarterlyData] = useState(null);
-  const [quarterlyLoading, setQuarterlyLoading] = useState(false);
   const [quarterlyError, setQuarterlyError] = useState('');
 
-  // MODIFIED: Fetch holding details with progressive loading
-  useEffect(() => {
-    fetchHoldingData();
-  }, [id]);
-
-  // MODIFIED: Separate ratios and quarterly loading after basic data is shown
-  useEffect(() => {
-    if (basicDataLoaded && holding && (holding.ticker || holding.symbol)) {
-      fetchFinancialRatios(holding.ticker || holding.symbol);
-      fetchQuarterlyResults(holding.ticker || holding.symbol); // NEW: Fetch quarterly data
-    }
-  }, [basicDataLoaded, holding]);
-
-  const fetchHoldingData = async () => {
+  // FIXED: Use useCallback to prevent infinite re-renders
+  const fetchHoldingData = useCallback(async () => {
     try {
       const response = await fetch('http://localhost:5000/api/holdings');
       const data = await response.json();
@@ -56,9 +43,15 @@ function HoldingDetails() {
     } catch (err) {
       setError('Failed to fetch holding data');
     }
-  };
+  }, [id]); // Include 'id' as dependency since it's used inside the function
 
-  const fetchFinancialRatios = async (ticker) => {
+  // FIXED: Add fetchHoldingData to dependency array
+  useEffect(() => {
+    fetchHoldingData();
+  }, [fetchHoldingData]);
+
+  // Use useCallback for other async functions to prevent unnecessary re-renders
+  const fetchFinancialRatios = useCallback(async (ticker) => {
     if (!ticker) return;
 
     setRatiosLoading(true);  // Show loader
@@ -68,7 +61,7 @@ function HoldingDetails() {
       const response = await fetch(`http://localhost:5000/api/stock-ratios/${ticker.toUpperCase()}`);
       
       if (!response.ok) {
-        const errorText = await response.text();
+        // FIXED: Removed unused errorText variable
         setRatiosError(`Unable to fetch ratios: ${response.status}`);
         return;
       }
@@ -85,13 +78,12 @@ function HoldingDetails() {
     } finally {
       setRatiosLoading(false);  // Hide loader
     }
-  };
+  }, []);
 
-  // NEW: Fetch quarterly results function
-  const fetchQuarterlyResults = async (ticker) => {
+  // Use useCallback for quarterly results function
+  const fetchQuarterlyResults = useCallback(async (ticker) => {
     if (!ticker) return;
     
-    setQuarterlyLoading(true);
     setQuarterlyError('');
     
     try {
@@ -109,20 +101,26 @@ function HoldingDetails() {
       }
     } catch (error) {
       setQuarterlyError(`Network error: ${error.message}`);
-    } finally {
-      setQuarterlyLoading(false);
     }
-  };
+  }, []);
+
+  // MODIFIED: Separate ratios and quarterly loading after basic data is shown
+  useEffect(() => {
+    if (basicDataLoaded && holding && (holding.ticker || holding.symbol)) {
+      fetchFinancialRatios(holding.ticker || holding.symbol);
+      fetchQuarterlyResults(holding.ticker || holding.symbol); // NEW: Fetch quarterly data
+    }
+  }, [basicDataLoaded, holding, fetchFinancialRatios, fetchQuarterlyResults]);
 
   // Helper function to parse numeric values safely
-  const parseNumericValue = (value, fallback = 0) => {
+  const parseNumericValue = useCallback((value, fallback = 0) => {
     if (typeof value === 'number') return value;
     const cleaned = String(value || '').replace(/[^\d.-]/g, '');
     return parseFloat(cleaned) || fallback;
-  };
+  }, []);
 
   // Calculate portfolio metrics
-  const calculatePortfolioMetrics = () => {
+  const calculatePortfolioMetrics = useCallback(() => {
     const avgPrice = parseNumericValue(holding?.avgPrice);
     const marketPrice = parseNumericValue(holding?.marketPrice);
     const quantity = holding?.quantity || 0;
@@ -140,10 +138,10 @@ function HoldingDetails() {
       returns,
       returnPercent
     };
-  };
+  }, [holding, parseNumericValue]);
 
   // Normalize purchase history data
-  const getPurchaseHistory = () => {
+  const getPurchaseHistory = useCallback(() => {
     const rawPurchases = holding?.purchases || holding?.transactions || [];
     
     return rawPurchases.map(purchase => ({
@@ -151,10 +149,10 @@ function HoldingDetails() {
       quantity: purchase.quantity ?? purchase.qty ?? 0,
       price: parseNumericValue(purchase.price)
     }));
-  };
+  }, [holding, parseNumericValue]);
 
   // Group financial ratios by category
-  const groupFinancialRatios = (ratiosData) => {
+  const groupFinancialRatios = useCallback((ratiosData) => {
     if (!ratiosData) return {};
 
     const categories = {
@@ -179,7 +177,7 @@ function HoldingDetails() {
     });
 
     return grouped;
-  };
+  }, []);
 
   // MODIFIED: Loading and error states - Progressive approach
   if (!basicDataLoaded && !holding) {
@@ -351,42 +349,12 @@ function HoldingDetails() {
         )}
       </section>
 
-      {/* NEW: Quarterly Results Section */}
-      <section className={`quarterly-section ${quarterlyLoading ? 'loading-glow-border' : ''}`}>
-        {/* Only show title when NOT loading */}
-        {!quarterlyLoading && (
-          <h3 className="quarterly-title">Quarterly Results</h3>
-        )}
-
-        {/* Quarterly loader */}
-        {quarterlyLoading && (
-          <div className="loader">
-            <p>Loading</p>
-            <div className="words">
-              <span className="word">Quarterly</span>
-              <span className="word">Results</span>
-              <span className="word">Sales</span>
-              <span className="word">Profits</span>
-              <span className="word">EPS</span>
-            </div>
-          </div>
-        )}
-
-        {/* Quarterly Results Section - FULL WIDTH */}
-        <div className="quarterly-breakout">
-          <section className={`quarterly-section ${quarterlyLoading ? 'loading-glow-border' : ''}`}>
-            {/* Only show title when NOT loading */}
-            {!quarterlyLoading && (
-              <h3 className="quarterly-title">Quarterly Results</h3>
-            )}
-
-            {/* Rest of your quarterly section code... */}
-          </section>
-        </div>
-
+      {/* FIXED: Quarterly Results Section - Single section, no duplicate loader */}
+      <section className="quarterly-section">
+        <h3 className="quarterly-title">Quarterly Results</h3>
 
         {/* Show error if quarterly data failed to load */}
-        {quarterlyError && !quarterlyLoading && (
+        {quarterlyError && (
           <div className="ratios-error">
             <strong>Error:</strong> {quarterlyError}
             <button 
@@ -399,7 +367,7 @@ function HoldingDetails() {
         )}
 
         {/* Show quarterly data when loaded successfully */}
-        {!quarterlyLoading && quarterlyData && !quarterlyError && (
+        {quarterlyData && !quarterlyError && (
           <div className="quarterly-table-container">
             <table className="quarterly-table">
               <thead>
@@ -428,6 +396,13 @@ function HoldingDetails() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Show placeholder when no data and no error */}
+        {!quarterlyData && !quarterlyError && (
+          <div className="quarterly-placeholder">
+            <p>Loading quarterly data...</p>
           </div>
         )}
       </section>
