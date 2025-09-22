@@ -2,14 +2,16 @@
  * HoldingDetails Component
  * Displays detailed information about a specific stock holding including
  * portfolio metrics, financial ratios, quarterly results, and purchase history
- * ENHANCED: Progressive Loading for Better UX + Quarterly Results
+ * ENHANCED: Progressive Loading for Better UX + Quarterly Results + Authentication
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
 import './HoldingDetails.css';
 
 function HoldingDetails() {
+  const { getAuthHeaders } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -28,7 +30,12 @@ function HoldingDetails() {
   // FIXED: Use useCallback to prevent infinite re-renders
   const fetchHoldingData = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/holdings');
+      const response = await fetch('http://localhost:5000/api/holdings', {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders() // ADD AUTH HEADERS
+        }
+      });
       const data = await response.json();
       
       const foundHolding = data.holdings.find(h => String(h.id) === String(id));
@@ -43,7 +50,7 @@ function HoldingDetails() {
     } catch (err) {
       setError('Failed to fetch holding data');
     }
-  }, [id]); // Include 'id' as dependency since it's used inside the function
+  }, [id, getAuthHeaders]); // Include getAuthHeaders as dependency
 
   // FIXED: Add fetchHoldingData to dependency array
   useEffect(() => {
@@ -58,7 +65,12 @@ function HoldingDetails() {
     setRatiosError('');
 
     try {
-      const response = await fetch(`http://localhost:5000/api/stock-ratios/${ticker.toUpperCase()}`);
+      const response = await fetch(`http://localhost:5000/api/stock-ratios/${ticker.toUpperCase()}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders() // ADD AUTH HEADERS
+        }
+      });
       
       if (!response.ok) {
         // FIXED: Removed unused errorText variable
@@ -78,7 +90,7 @@ function HoldingDetails() {
     } finally {
       setRatiosLoading(false);  // Hide loader
     }
-  }, []);
+  }, [getAuthHeaders]);
 
   // Use useCallback for quarterly results function
   const fetchQuarterlyResults = useCallback(async (ticker) => {
@@ -87,7 +99,12 @@ function HoldingDetails() {
     setQuarterlyError('');
     
     try {
-      const response = await fetch(`http://localhost:5000/api/quarterly-results/${ticker.toUpperCase()}`);
+      const response = await fetch(`http://localhost:5000/api/quarterly-results/${ticker.toUpperCase()}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders() // ADD AUTH HEADERS
+        }
+      });
       
       if (response.ok) {
         const data = await response.json();
@@ -102,7 +119,7 @@ function HoldingDetails() {
     } catch (error) {
       setQuarterlyError(`Network error: ${error.message}`);
     }
-  }, []);
+  }, [getAuthHeaders]);
 
   // MODIFIED: Separate ratios and quarterly loading after basic data is shown
   useEffect(() => {

@@ -4,9 +4,10 @@
  * and sell functionality
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Holdings.css';
+import { useAuth } from '../auth/AuthContext';
 
 // Configuration
 const API_BASE_URL = 'http://localhost:5000/api';
@@ -17,6 +18,8 @@ const MARKET_HOURS = {
 const LIVE_UPDATE_INTERVAL = 30000; // 30 seconds
 
 function Holdings() {
+  const { getAuthHeaders } = useAuth();
+  
   // State management
   const [holdings, setHoldings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,7 +54,33 @@ function Holdings() {
     );
   };
 
-  // Data fetching
+  // Data fetching with authentication
+  const fetchHoldings = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/holdings`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders() // ADD AUTH HEADERS
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setHoldings(data.holdings || []);
+        setError('');
+      } else {
+        setError(data.error || 'Failed to fetch holdings');
+      }
+    } catch (err) {
+      setError('Failed to fetch holdings');
+    } finally {
+      setLoading(false);
+    }
+  }, [getAuthHeaders]);
+
+  // Effect for data fetching and live updates
   useEffect(() => {
     fetchHoldings();
 
@@ -67,26 +96,7 @@ function Holdings() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [liveUpdate]);
-
-  const fetchHoldings = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}/holdings`);
-      const data = await response.json();
-      
-      if (response.ok) {
-        setHoldings(data.holdings || []);
-        setError('');
-      } else {
-        setError(data.error || 'Failed to fetch holdings');
-      }
-    } catch (err) {
-      setError('Failed to fetch holdings');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [liveUpdate, fetchHoldings]);
 
   // Modal management
   const openSellModal = (holding) => {
@@ -101,7 +111,7 @@ function Holdings() {
     setSellQuantity('');
   };
 
-  // Sell functionality
+  // Sell functionality with authentication
   const handleSellStock = async () => {
     const quantity = parseInt(sellQuantity, 10);
     
@@ -113,7 +123,10 @@ function Holdings() {
     try {
       const response = await fetch(`${API_BASE_URL}/holdings/${selectedHolding.id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders() // ADD AUTH HEADERS
+        },
         body: JSON.stringify({ sellQuantity: quantity }),
       });
 

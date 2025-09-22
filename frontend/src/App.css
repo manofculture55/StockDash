@@ -601,3 +601,60 @@ body {
     font-size: 14px;
   }
 }
+
+/* ============================================================================
+   AUTHENTICATION INTEGRATION STYLES
+   ============================================================================ */
+
+/* Header controls */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-welcome {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.logout-button {
+  background: var(--error-color);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+  background: #ff3333;
+  transform: translateY(-1px);
+}
+
+/* Responsive header */
+@media (max-width: 768px) {
+  .header-controls {
+    gap: 10px;
+  }
+  
+  .user-welcome {
+    font-size: 12px;
+  }
+  
+  .logout-button {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+}

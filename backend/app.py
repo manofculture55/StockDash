@@ -14,6 +14,7 @@ import re
 import time
 import traceback
 from datetime import datetime
+from auth import register_user, login_user, jwt_required, get_current_user
 
 # Import database functions
 from database import (
@@ -37,6 +38,110 @@ init_database()
 print("🗄️ SQLite database initialized")
 
 # ============================================================================
+# AUTHENTICATION ROUTES
+# ============================================================================
+
+@app.route('/api/register', methods=['POST'])
+def register():
+    """Register new user account"""
+    try:
+        data = request.get_json() or {}
+        
+        username = data.get('username', '').strip()
+        email = data.get('email', '').strip()
+        password = data.get('password', '').strip()
+        first_name = data.get('first_name', '').strip()
+        last_name = data.get('last_name', '').strip()
+        
+        if not username or not email or not password:
+            return jsonify({'error': 'Username, email, and password are required'}), 400
+        
+        result = register_user(username, email, password, first_name, last_name)
+        
+        if 'error' in result:
+            return jsonify({'error': result['error']}), 400
+        
+        return jsonify({
+            'message': result['message'],
+            'user': {
+                'id': result['user_id'],
+                'username': result['username'],
+                'email': result['email']
+            },
+            'token': result['token']
+        }), 201
+        
+    except Exception as e:
+        return jsonify({'error': f'Registration failed: {str(e)}'}), 500
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    """User login endpoint"""
+    try:
+        data = request.get_json() or {}
+        
+        username = data.get('username', '').strip()
+        password = data.get('password', '').strip()
+        
+        if not username or not password:
+            return jsonify({'error': 'Username and password are required'}), 400
+        
+        result = login_user(username, password)
+        
+        if 'error' in result:
+            return jsonify({'error': result['error']}), 401
+        
+        return jsonify({
+            'message': result['message'],
+            'user': {
+                'id': result['user_id'],
+                'username': result['username'],
+                'email': result['email'],
+                'first_name': result['first_name'],
+                'last_name': result['last_name']
+            },
+            'token': result['token']
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Login failed: {str(e)}'}), 500
+
+@app.route('/api/profile', methods=['GET'])
+@jwt_required
+def get_profile():
+    """Get current user profile"""
+    try:
+        current_user = get_current_user()
+        user_id = current_user['user_id']
+        
+        # Get full user details from database
+        from database import get_user_by_id
+        user = get_user_by_id(user_id)
+        
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        return jsonify({
+            'user': {
+                'id': user['id'],
+                'username': user['username'],
+                'email': user['email'],
+                'first_name': user.get('first_name', ''),
+                'last_name': user.get('last_name', ''),
+                'created_at': user['created_at']
+            }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Profile fetch failed: {str(e)}'}), 500
+
+@app.route('/api/logout', methods=['POST'])
+@jwt_required
+def logout():
+    """User logout endpoint (client-side token removal)"""
+    return jsonify({'message': 'Logged out successfully'}), 200
+
+# ============================================================================
 # UTILITY FUNCTIONS
 # ============================================================================
 
@@ -50,11 +155,9 @@ def parse_price(value):
     cleaned = re.sub(r'[^\d.]', '', str(value))
     return float(cleaned) if cleaned else 0.0
 
-
 def get_today_date():
     """Get today's date in YYYY-MM-DD format"""
     return datetime.now().strftime('%Y-%m-%d')
-
 
 def is_data_fresh(data_entry):
     """Check if cached data is from today"""
@@ -62,15 +165,14 @@ def is_data_fresh(data_entry):
         return False
     return data_entry['date'] == get_today_date()
 
-
 # ============================================================================
-# DATABASE-BASED CACHING FUNCTIONS
+# DATABASE-BASED CACHING FUNCTIONS (UPDATED WITH USER SUPPORT)
 # ============================================================================
 
-def get_cached_ratios_by_ticker(ticker):
+def get_cached_ratios_by_ticker(ticker, user_id):
     """Get cached ratios for a ticker if from today"""
     # Find holding by ticker first
-    existing_holding = find_existing_holding_by_ticker(ticker)
+    existing_holding = find_existing_holding_by_ticker(ticker, user_id)
     if not existing_holding:
         return None
     
@@ -82,10 +184,9 @@ def get_cached_ratios_by_ticker(ticker):
     
     return None
 
-
-def save_ratios_to_cache_by_ticker(ticker, ratios_data):
+def save_ratios_to_cache_by_ticker(ticker, ratios_data, user_id):
     """Save ratios data to database with today's date"""
-    existing_holding = find_existing_holding_by_ticker(ticker)
+    existing_holding = find_existing_holding_by_ticker(ticker, user_id)
     if not existing_holding:
         print(f"⚠️  [CACHE] No holding found for {ticker} to save ratios")
         return
@@ -93,13 +194,12 @@ def save_ratios_to_cache_by_ticker(ticker, ratios_data):
     today = get_today_date()
     updated_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     
-    save_ratios_cache(existing_holding['id'], ratios_data, today, updated_time)
+    save_ratios_cache(existing_holding['id'], ratios_data, today, updated_time, user_id)
     print(f"💾 [CACHE] Saved ratios for {ticker} with date {today}")
 
-
-def get_cached_quarterly_by_ticker(ticker):
+def get_cached_quarterly_by_ticker(ticker, user_id):
     """Get cached quarterly data for a ticker if from today"""
-    existing_holding = find_existing_holding_by_ticker(ticker)
+    existing_holding = find_existing_holding_by_ticker(ticker, user_id)
     if not existing_holding:
         return None
     
@@ -110,10 +210,9 @@ def get_cached_quarterly_by_ticker(ticker):
     
     return None
 
-
-def save_quarterly_to_cache_by_ticker(ticker, quarterly_data):
+def save_quarterly_to_cache_by_ticker(ticker, quarterly_data, user_id):
     """Save quarterly data to database with today's date"""
-    existing_holding = find_existing_holding_by_ticker(ticker)
+    existing_holding = find_existing_holding_by_ticker(ticker, user_id)
     if not existing_holding:
         print(f"⚠️  [CACHE] No holding found for {ticker} to save quarterly data")
         return
@@ -121,9 +220,8 @@ def save_quarterly_to_cache_by_ticker(ticker, quarterly_data):
     today = get_today_date()
     updated_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     
-    save_quarterly_cache(existing_holding['id'], quarterly_data, today, updated_time)
+    save_quarterly_cache(existing_holding['id'], quarterly_data, today, updated_time, user_id)
     print(f"💾 [CACHE] Saved quarterly data for {ticker} with date {today}")
-
 
 # ============================================================================
 # EXTERNAL DATA PROVIDERS
@@ -154,7 +252,6 @@ def get_company_name_from_screener(ticker):
     except Exception as e:
         print(f"Error fetching from screener: {e}")
         return None, url
-
 
 def get_kotak_price_from_url(kotak_url):
     """Get current price, previous close, and price change from Kotak URL"""
@@ -192,9 +289,12 @@ def get_kotak_price_from_url(kotak_url):
             if label_cell and 'Prev. Close' in label_cell.text:
                 value_cell = row.find('td', {'class': re.compile('StockDetail_stock-detail-performance-table-value.*')})
                 if value_cell:
-                    previous_close = value_cell.text.strip()
+                    # Clean the previous close value to extract just the number
+                    prev_close_text = value_cell.text.strip()
+                    prev_close_cleaned = re.sub(r'[^\d.]', '', prev_close_text)
+                    previous_close = prev_close_cleaned if prev_close_cleaned else "0"
                 break
-        
+
         # Parse price change components
         price_change_amount = None
         price_change_percent = None
@@ -218,7 +318,6 @@ def get_kotak_price_from_url(kotak_url):
     except Exception as e:
         print(f"Error fetching Kotak data: {e}")
         return None
-
 
 def find_working_kotak_url(company_name):
     """Try multiple variations of company name to find the correct Kotak URL"""
@@ -293,7 +392,6 @@ def find_working_kotak_url(company_name):
     print(f"❌ All Kotak URL attempts failed for {company_name}")
     return None, None
 
-
 # ============================================================================
 # API ROUTES
 # ============================================================================
@@ -312,7 +410,6 @@ def test_route():
         }
     })
 
-
 @app.route('/api/suggestions', methods=['GET'])
 def get_suggestions():
     """Get stock search suggestions from database"""
@@ -323,7 +420,6 @@ def get_suggestions():
     
     suggestions = get_companies_for_suggestions(query)
     return jsonify({'suggestions': suggestions[:10]})
-
 
 @app.route('/api/stock-price')
 def get_stock_price():
@@ -396,44 +492,25 @@ def get_stock_price():
                     "previous_close": "0"
                 }
 
-        # Add detailed ratios if requested (with database caching)
-        if detailed and response_data:
-            print(f"📊 Detailed ratios requested for {ticker}")
-            
-            # Try to get cached ratios first
-            cached_ratios = get_cached_ratios_by_ticker(ticker)
-            if cached_ratios:
-                response_data['ratios'] = cached_ratios
-                response_data['ratios_count'] = len(cached_ratios)
-                response_data['ratios_cached'] = True
-            else:
-                # Scrape fresh ratios
-                fresh_ratios = scrape_screener_ratios(ticker)
-                if fresh_ratios:
-                    save_ratios_to_cache_by_ticker(ticker, fresh_ratios)
-                    response_data['ratios'] = fresh_ratios
-                    response_data['ratios_count'] = len(fresh_ratios)
-                    response_data['ratios_cached'] = False
-                else:
-                    response_data['ratios'] = {}
-                    response_data['ratios_count'] = 0
-
         return jsonify(response_data)
 
     except Exception as e:
         print(f"Error in get_stock_price: {e}")
         return jsonify({"error": str(e)}), 500
 
-
 @app.route('/api/stock-ratios/<ticker>')
+@jwt_required
 def get_stock_ratios(ticker):
     """Get financial ratios - cached if same day, fresh if different day"""
     ticker = ticker.upper()
     print(f"🎯 Ratios requested for {ticker}")
     
     try:
+        current_user = get_current_user()
+        user_id = current_user['user_id']
+        
         # Try to get cached ratios first
-        cached_ratios = get_cached_ratios_by_ticker(ticker)
+        cached_ratios = get_cached_ratios_by_ticker(ticker, user_id)
         if cached_ratios:
             return jsonify({
                 'ticker': ticker,
@@ -448,7 +525,7 @@ def get_stock_ratios(ticker):
         fresh_ratios = scrape_screener_ratios(ticker)
         
         if fresh_ratios:
-            save_ratios_to_cache_by_ticker(ticker, fresh_ratios)
+            save_ratios_to_cache_by_ticker(ticker, fresh_ratios, user_id)
             return jsonify({
                 'ticker': ticker,
                 'ratios': fresh_ratios,
@@ -464,16 +541,19 @@ def get_stock_ratios(ticker):
         print(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
 
-
 @app.route('/api/quarterly-results/<ticker>')
+@jwt_required
 def get_quarterly_results(ticker):
     """Get quarterly results - cached if same day, fresh if different day"""
     ticker = ticker.upper()
     print(f"📊 Quarterly results requested for {ticker}")
     
     try:
+        current_user = get_current_user()
+        user_id = current_user['user_id']
+        
         # Try to get cached quarterly data first
-        cached_quarterly = get_cached_quarterly_by_ticker(ticker)
+        cached_quarterly = get_cached_quarterly_by_ticker(ticker, user_id)
         if cached_quarterly:
             return jsonify({
                 'quarterly_data': cached_quarterly,
@@ -486,7 +566,7 @@ def get_quarterly_results(ticker):
         fresh_quarterly = scrape_quarterly_results(ticker)
         
         if fresh_quarterly:
-            save_quarterly_to_cache_by_ticker(ticker, fresh_quarterly)
+            save_quarterly_to_cache_by_ticker(ticker, fresh_quarterly, user_id)
             return jsonify({
                 'quarterly_data': fresh_quarterly,
                 'cached': False,
@@ -499,12 +579,15 @@ def get_quarterly_results(ticker):
         print(f"❌ [API] Error in quarterly results endpoint: {str(e)}")
         return jsonify({'error': 'Internal server error'}), 500
 
-
 @app.route('/api/holdings', methods=['GET'])
+@jwt_required
 def get_holdings():
     """Get all holdings with updated market prices"""
     try:
-        holdings = get_all_holdings()
+        current_user = get_current_user()
+        user_id = current_user['user_id']
+        
+        holdings = get_all_holdings(user_id)
         
         # Update market data for all holdings
         for holding in holdings:
@@ -536,11 +619,14 @@ def get_holdings():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
 @app.route('/api/holdings', methods=['POST'])
+@jwt_required
 def add_holding():
     """Add a new holding or update existing one"""
     try:
+        current_user = get_current_user()
+        user_id = current_user['user_id']
+        
         holding_data = request.get_json() or {}
         date = (holding_data.get('date') or '').strip()
 
@@ -575,8 +661,8 @@ def add_holding():
         else:
             company_id = company_data['id']
 
-        # Check for existing holding
-        existing_holding = find_existing_holding_by_ticker(ticker)
+        # Check for existing holding (ADD user_id parameter)
+        existing_holding = find_existing_holding_by_ticker(ticker, user_id)
         
         if existing_holding:
             # Update existing holding
@@ -589,14 +675,15 @@ def add_holding():
             # Update holding in database
             update_holding_avg_price_and_quantity(existing_holding['id'], total_qty, avg_price)
             
-            # Add purchase record
-            add_purchase(existing_holding['id'], date, new_qty, new_price_num)
+            # Add purchase record (ADD user_id parameter)
+            add_purchase(existing_holding['id'], date, new_qty, new_price_num, user_id)
             
             message = "Existing holding updated"
             result_holding = get_holding_by_id(existing_holding['id'])
         else:
-            # Create new holding
+            # Create new holding (ADD user_id to holding_data)
             holding_id = create_holding({
+                'user_id': user_id,
                 'company_id': company_id,
                 'name': company_name,
                 'symbol': ticker.upper(),
@@ -608,8 +695,8 @@ def add_holding():
                 'date': date
             })
             
-            # Add purchase record
-            add_purchase(holding_id, date, new_qty, new_price_num)
+            # Add purchase record (ADD user_id parameter)
+            add_purchase(holding_id, date, new_qty, new_price_num, user_id)
             
             message = "Holding added successfully"
             result_holding = get_holding_by_id(holding_id)
@@ -620,11 +707,13 @@ def add_holding():
         print(f"Error in add_holding: {e}")
         return jsonify({"error": str(e)}), 500
 
-
 @app.route('/api/holdings/<string:holding_id>', methods=['PATCH'])
+@jwt_required
 def sell_holding_quantity(holding_id):
     """Sell partial or complete holding"""
     try:
+        current_user = get_current_user()
+        
         sell_quantity = request.json.get("sellQuantity", 0)
         if sell_quantity <= 0:
             return jsonify({"error": "Sell quantity must be positive"}), 400
@@ -647,7 +736,6 @@ def sell_holding_quantity(holding_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
 # ============================================================================
 # DEBUG ROUTES
 # ============================================================================
@@ -663,7 +751,6 @@ def list_routes():
         output.append(line)
     return '<br>'.join(output)
 
-
 @app.route('/debug/test-scraper')
 def test_scraper_route():
     """Test scraper functionality"""
@@ -678,7 +765,6 @@ def test_scraper_route():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
 # ============================================================================
 # APPLICATION STARTUP
 # ============================================================================
@@ -688,9 +774,8 @@ if __name__ == '__main__':
     
     # Get database stats
     companies = get_companies_for_suggestions('')
-    holdings = get_all_holdings()
     
-    print(f"🗄️ Database stats: {len(companies)} companies, {len(holdings)} holdings")
+    print(f"🗄️ Database stats: {len(companies)} companies")
     
     print("\n📋 Registered Routes:")
     for rule in app.url_map.iter_rules():

@@ -17,9 +17,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.edge.service import Service as EdgeService
 
 # Configuration
-SCREENER_USERNAME = 'webav27912@noidem.com'  # TODO: Move to environment variables
-SCREENER_PASSWORD = 'Password1234@'          # TODO: Move to environment variables
-EDGE_DRIVER_PATH = r'D:\React\msedgedriver.exe'
+import os
+SCREENER_USERNAME = os.environ.get('SCREENER_USERNAME', 'your_username')
+SCREENER_PASSWORD = os.environ.get('SCREENER_PASSWORD', 'your_password')
+EDGE_DRIVER_PATH = os.environ.get('EDGE_DRIVER_PATH', r'D:\StockDash\msedgedriver.exe')
+
 
 # Thread synchronization
 selenium_lock = Lock()
